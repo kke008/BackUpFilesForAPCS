@@ -24,6 +24,17 @@ public class DoubleBeeperKarel extends SuperKarel {
 			move();
 			turnAround();
 		}
+
+		move();
+		while (beepersPresent()) {
+			turnAround();
+			pickBeeper();
+			move();
+			putBeeper();
+			putBeeper();
+			turnAround();
+			move();
+		}
 	}
 	    
 }
