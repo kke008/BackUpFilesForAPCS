@@ -20,9 +20,12 @@ public class MidpointFindingKarel extends SuperKarel {
 	   while (noBeepersPresent()) {
 	      toEnd();
 	   }
+
+	   if (beepersPresent())
+	      pickBeeper();
 	}
 	
-	function toEnd() {
+	public void toEnd() {
 	   move();
 	   while(frontIsClear() && noBeepersPresent())
 	      move();
