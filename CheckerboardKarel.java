@@ -10,37 +10,71 @@
 import stanford.karel.*;
 
 public class CheckerboardKarel extends SuperKarel {
-	
 	public void run() {
-		putBeeper();
-		while (leftIsClear() || rightIsClear())	
+		while (frontIsClear() && leftIsClear()) {   
 			makeRow();
-			turnLeft();
-			checkBeeper();
-			turnLeft();
+			left();
+
 			makeRow();
-			turnRight();
-			checkBeeper();
-			turnRight();
+		      if (rightIsClear())
+		         right();
+		   }
+		   
+		   if (rightIsClear())
+		      makeRow();
 	}
 	
-	public void makeRow() {
-		while (frontIsClear()) {
-			move();
-			if (frontIsClear()) {
-				move();
-				putBeeper();
-			}
-		}
+	function makeRow() {
+	   while (frontIsClear()) {
+	      putBeeper();
+	      move();
+	      if (frontIsClear())
+	         move();
+	   }
+	   
+	   turnAround();
+	   move();
+	   turnAround();
+	   if (beepersPresent())
+	      move();
+	   
+	   else {
+	      move();
+	      putBeeper();
+	   }
 	}
 	
-	public void checkBeeper() {
-		if (beepersPresent())
-			move();
-			
-		else {
-			move();
-			putBeeper();
-		}
+	function left() {
+	   turnLeft();
+	   if (beepersPresent()) {
+	      move();
+	      turnLeft();
+	   }
+	   
+	   else {
+	      move();
+	      putBeeper();
+	      turnLeft();
+	      move();  
+	   }
+	   
+	   move();
+	}
+	
+	function right() {
+	   turnRight();
+	   if (beepersPresent()) {
+	      move();
+	      turnRight();
+	   }
+	   
+	   else {
+	      move();
+	      putBeeper();
+	      turnRight();
+	      move();  
+	   }
+	   
+	   move();
 	}
 }
