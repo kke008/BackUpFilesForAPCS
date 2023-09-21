@@ -28,25 +28,21 @@ public class SimpleGraphics extends GraphicsProgram {
 	
 	/*	All fields and constants should be declared here.
 	 *	Only constants (final) are initialized here. */
-	private GOval circle;	// circles to be drawn
-	private final double RADIUS = 300;	// radius of biggest circle
 	
 	private GRect brick;	// bricks to be drawn
 	private final double WIDTH = 50;	// width of each brick
 	private final double HEIGHT = 20;	// height of each brick
 	
-	private double center;		// x coordinate of the center of the window
-	private double yCoord;		// x coordinate to draw circles and bricks
+	private double center;	// x coordinate of the center of the window	
+	private double height;	// height of window
 	
 	/**	The init() method is executed before the run() method.
 	 *	All initialization steps should be performed here.
 	 */
 	public void init() {
 		GCanvas canvas = getGCanvas();
-		center = canvas.getWidth() / 2.0 - RADIUS;
-		yCoord = canvas.getHeight() - RADIUS;
-		circle = new GOval(center, yCoord, 2 * RADIUS, 2 * RADIUS);
-		brick = new GRect(center, yCoord, WIDTH, HEIGHT);
+		center = canvas.getWidth() / 2.0;
+		height = canvas.getHeight();
 	}
 
 	/**	The run() method is executed after init().
@@ -54,31 +50,54 @@ public class SimpleGraphics extends GraphicsProgram {
 	 *	Exercise hint: Use one-dimensional arrays for the GOval's and GRect's.
 	 */
 	public void run() {
-		for (int i = 1; i < 6; i++) {
+		//drawTarget();
+		drawBricks();
+	}
+	
+	/** drawTarget() draws 5 alternating red and white rings in the shape
+	 * 	of a target at the bottom of the screen.
+	 * 	Only half of the target is shown, the other half is cut off by
+	 * 	the screen.
+	 */
+	public void drawTarget() {
+		int radius = 200;	// radius of circles (biggest = 200)
+		double targetX = center - radius;	// x coordinate to draw circles
+		double targetY = height - radius; 	// y coordinate to draw 
+												//circles
+		GOval circle = new GOval(targetX, targetY, 2 * radius, 2 * radius);	
+		// "ring" of the target
+		
+		for (int i = 0; i < 5; i++) {
 			circle.setFilled(true);
-			if (i % 2 == 1)
+			if (i % 2 == 0)
 				circle.setFillColor(Color.RED);
 			else
 				circle.setFillColor(Color.WHITE);
-			add (circle);
-			
-			double newRadius = 2 * (RADIUS - (40 * i));
-			center = canvas.getWidth() / 2.0 - newRadius;
-			circle = new GOval(center, yCoord, newRadius, newRadius);
-			
+				
+			add(circle);
+			radius -= 30;
+			targetX += 30;
+			targetY += 30;
+			circle = new GOval(targetX, targetY, 2 * radius, 2 * radius);
 		}
-		
-		
-		/*circle = new GOval(100, 100, RADIUS * 2, RADIUS * 2);
-		circle.setFilled(true);
-		circle.setFillColor(Color.RED);
-		
-		square = new GRect(300, 100, SIDE, SIDE);
-		square.setFilled(true);
-		square.setFillColor(Color.BLUE);
-		
-		add(circle);
-		add(square);
-		*/
 	}
+	 
+	 /** drawBricks() draws rectangular 50 x 20 bricks in an upside
+	  *  down pyramid centered at the top of the screen.
+	  *  The pyramid will have 10 rows.
+	  */
+	 public void drawBricks() {
+		 double brickX;	// x coordinate of each brick
+		 double brickY;		// y coordinate of each brick
+		 
+		 for (int j = 0; j < 10; j++) {	// row number
+			 for (int k = 0; k < j; k++) {	// number of bricks in row
+				 brickY = j * HEIGHT;
+				 brickX = center - (k - j/2) * WIDTH;
+				 brick = new GRect(brickX, brickY, WIDTH, HEIGHT);
+					// brick to be drawn
+				 add(brick);
+			 }
+		 }
+	 }
 }
