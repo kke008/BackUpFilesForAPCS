@@ -87,17 +87,16 @@ public class SimpleGraphics extends GraphicsProgram {
 	  *  The pyramid will have 10 rows.
 	  */
 	 public void drawBricks() {
-		 double brickX;	// x coordinate of each brick
+public void drawBricks() {
 		 double brickY;		// y coordinate of each brick
-		 
-		 for (int j = 0; j < 10; j++) {	// row number
-			 for (int k = 0; k < j; k++) {	// number of bricks in row
-				 brickY = j * HEIGHT;
-				 brickX = center - (k - j/2) * WIDTH;
-				 brick = new GRect(brickX, brickY, WIDTH, HEIGHT);
-					// brick to be drawn
-				 add(brick);
-			 }
-		 }
+		 double brickX;	// x coordinate of each brick
+		brickY = 0 * HEIGHT;
+		brickX = center - ((ROWS - 0)/2.0) * WIDTH;
+		for (int i = 0; i < ROWS; i++) {
+			brickX += WIDTH;
+			brick = new GRect(brickX, brickY, WIDTH, HEIGHT);
+			add(brick);
+		}
+	}
 	 }
 }
