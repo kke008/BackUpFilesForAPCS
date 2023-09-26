@@ -11,18 +11,24 @@ import java.io.PrintWriter;
  */
 public class MVCipher {
 	private String key;
+	private String encrypted;
 	// fields go here
 		
 	/** Constructor */
-	public MVCipher() { }
+	public MVCipher() {
+		key = "";
+		encrypted = "";
+	}
 	
 	public static void main(String[] args) {
 		MVCipher mvc = new MVCipher();
 		mvc.run();
 	}
 	
-	/**
-	 *	Method header goes here
+	/** Uses the Prompt class to get the key, a variable representing 
+	 * 	encryption or decryption, input file name, and output file name.
+	 * 	Then reads and processes the input file, and prints it to the
+	 * 	output file.
 	 */
 	public void run() {
 		System.out.println("\n Welcome to the MV Cipher machine!\n");
@@ -30,7 +36,6 @@ public class MVCipher {
 		/* Prompt for a key and change to uppercase
 		   Do not let the key contain anything but alpha
 		   Use the Prompt class to get user input */
-		   
 		do {
 			boolean goodKey = false;
 			key = Prompt.getString("Please input a word to use as key " +
@@ -39,26 +44,35 @@ public class MVCipher {
 				goodKey = true;
 				
 			for (int i = 0; i < key.length(); i++) {
-				int letter = (int)(key.charAt(i));
-				if (letter >
+				String check = checkChar(key.charAt(i));
+				if(check.equals("neither"))
+					goodKey = false;
 			}
 			
+			if (goodKey = false)
+				System.out.println("ERROR: key must be all letters and " +
+					"at least 3 letters long");
+					
 		} while (goodKey = false);
 		
-		
 		/* Prompt for encrypt or decrypt */
-			
+		int cryptNum = Prompt.getInt("Encrypt or decrypt?", 1, 2);
 			
 		/* Prompt for an input file name */
-		
+		String inFileName = Prompt.getString("Name of file to encrypt");
 		
 		/* Prompt for an output file name */
+		String outFileName = Prompt.getString("Name of output file");
 		
-		
-		/* Read input file, encrypt or decrypt, and print to output file */
-		
-		
-		/* Don't forget to close your output file */
+		/* Read input file, encrypt or decrypt, and print to output file.
+		 * Closes output file */
+		Scanner readIn = FileUtils.openToRead(inFileName);
+		while (readIn.hasNext()) {
+			String ogLine = readIn.nextLine();
+			String changedLine = getNewLine(ogLine, cryptNum)
+			PrintWriter writeOut = FileUtils.openToWrite(outFileName);
+			writeOut.append(changedLine + "\n");
+		}
 	}
 	
 	// other methods go here
@@ -82,31 +96,15 @@ public class MVCipher {
 		return value;
 	}
 	
-	/** Reads each line of a file based on the user's input, then calls 
-	 *  changeLine to encrypt or decrypt that line.
-	 *  Writes the changed line to another file, also specified by the 
-	 * 	user.
-	 * 	@param inFile	name of file to encrypt or decrypt
-	 * 	@param outFile	name of file to put encrypted or decrypted text
-	 * 					into
-	 */
-	public void changeFile(String inFile, String outFile) {
-		Scanner readIn = FileUtils.openToRead(inFile);
-		
-		
-		PrintWriter writeOut = FileUtils.openToWrite(outFile);
-	}
-	
 	
 	/** Encrypts or decrypts lines of a file using the key.
 	 * @param fileLine	line of file to encrypt or decrypt
 	 * @param change	int from user to decide whether to encrypt or decrypt
 	 * @return newLine	encrypted or decrypted line
 	 */
-	public String changeLine(String fileLine, int change) {
+	public String getNewLine(String fileLine, int change) {
 		String newLine = "";
 		
 		return newLine;
 	}
-	
 }
