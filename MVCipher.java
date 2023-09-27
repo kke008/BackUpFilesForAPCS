@@ -51,8 +51,7 @@ public class MVCipher {
 			
 			if (goodKey = false)
 				System.out.println("ERROR: key must be all letters and " +
-					"at least 3 letters long");
-					
+					"at least 3 letters long");	
 		} while (goodKey = false);
 		
 		/* Prompt for encrypt or decrypt */
