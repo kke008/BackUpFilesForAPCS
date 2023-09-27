@@ -10,14 +10,14 @@ import java.io.PrintWriter;
  *	@since	September 21, 2023
  */
 public class MVCipher {
-	private String key;
-	private String encrypted;
+	private String key;	// the word used to encrypt / decrypt
+	private int cryptNum;	// int that represents whether to encrypt or
+				// decrypt
 	// fields go here
 		
 	/** Constructor */
 	public MVCipher() {
 		key = "";
-		encrypted = "";
 	}
 	
 	public static void main(String[] args) {
@@ -42,20 +42,18 @@ public class MVCipher {
 				"(letters only)");
 			if (key.length() >= 3)
 				goodKey = true;
-				
 			for (int i = 0; i < key.length(); i++) {
 				String check = checkChar(key.charAt(i));
 				if(check.equals("neither"))
 					goodKey = false;
 			}
-			
 			if (goodKey = false)
 				System.out.println("ERROR: key must be all letters and " +
 					"at least 3 letters long");	
 		} while (goodKey = false);
 		
 		/* Prompt for encrypt or decrypt */
-		int cryptNum = Prompt.getInt("Encrypt or decrypt?", 1, 2);
+		cryptNum = Prompt.getInt("Encrypt or decrypt?", 1, 2);
 			
 		/* Prompt for an input file name */
 		String inFileName = Prompt.getString("Name of file to encrypt");
@@ -83,18 +81,16 @@ public class MVCipher {
 	public int checkChar(char charIn) {
 		int letterNum = (int)(charIn);
 		String value = -1;
+		
 		if (letterNum >= (int)('a') && letterNum <= (int)('z'))
-			value = "lower";
-			
+			value = "lower";	
 		else if (letterNum >= (int)('A') && letterNum <= (int)('Z'))
 			value = "upper";
-			
 		else
 			value = "neither";
 			
 		return value;
 	}
-	
 	
 	/** Encrypts or decrypts lines of a file using the key.
 	 * @param fileLine	line of file to encrypt or decrypt
@@ -103,7 +99,15 @@ public class MVCipher {
 	 */
 	public String getNewLine(String fileLine, int change) {
 		String newLine = "";
-		
+		for (int j = 0; j < fileLine.length(); j++) {
+			String charVal = checkChar(fileLine.charAt(j));
+			if (charVal.equals("upper"))
+				newLine += changeUpper(fileLine.charAt(j));
+			else if (charVal.equals("lower"))
+				newLine += changeLower(fileLine.charAt(j));
+			else
+				newLine += fileLine.charAt(j);
+		}
 		return newLine;
 	}
 }
