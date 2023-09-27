@@ -13,6 +13,7 @@ public class MVCipher {
 	private String key;	// the word used to encrypt / decrypt
 	private int cryptNum;	// int that represents whether to encrypt or
 				// decrypt
+	private final int LENGTH_OF_ALPHABET = 26;	// 26 letters in alphabet
 	// fields go here
 		
 	/** Constructor */
@@ -92,22 +93,65 @@ public class MVCipher {
 		return value;
 	}
 	
-	/** Encrypts or decrypts lines of a file using the key.
+	/** Encrypts or decrypts lines of a file one char at a time. Keeps track
+ 	 *  of which letter of the key that each char corresponds with using the
+   	 *  letter's index.
 	 * @param fileLine	line of file to encrypt or decrypt
 	 * @param change	int from user to decide whether to encrypt or decrypt
 	 * @return newLine	encrypted or decrypted line
 	 */
 	public String getNewLine(String fileLine, int change) {
 		String newLine = "";
+		int keyIndex = 0;
 		for (int j = 0; j < fileLine.length(); j++) {
 			String charVal = checkChar(fileLine.charAt(j));
 			if (charVal.equals("upper"))
-				newLine += changeUpper(fileLine.charAt(j));
+				newLine += changeUpper(fileLine.charAt(j), keyIndex);
 			else if (charVal.equals("lower"))
-				newLine += changeLower(fileLine.charAt(j));
-			else
+				newLine += changeLower(fileLine.charAt(j), keyIndex);
+			else {
 				newLine += fileLine.charAt(j);
+				keyIndex --;
+			}
+			keyIndex ++;
 		}
 		return newLine;
+	}
+
+	/** Encrypts or decrypts uppercase (letter) chars using the index of the letter
+ 	 *  in the key that corresponds with the char and the cryptNum. To encrypt, the
+   	 *  char is shifted up. To decrypt, it is shifted down.
+     	 * @param ogChar	the original char that needs to be shifted
+       	 * @param keyIndexIn	the index of the corresponding letter of the key
+	 * @return newChar	the shifted char
+	 */
+	public char changeUpper(char ogChar, int keyIndexIn) {
+		int keyInt = (int)(key.charAt(keyIndex));	// ASCII of key letter
+		int shift = (keyInt - (int)('A') - 1) % LENGTH_OF_ALPHABET;
+		// how much to shift the letter by
+		if (cryptNum == 1)
+			char newChar = (char)(ogChar + shift);
+		else
+			char newChar = (char)(ogChar - shift);
+		return newChar;
+	}
+
+	/** Encrypts or decrypts lowercase (letter) chars using the index of the letter
+ 	 *  in the key that corresponds with the char and the cryptNum. To encrypt, the
+   	 *  char is shifted up. To decrypt, it is shifted down.
+     	 * @param ogChar	the original char that needs to be shifted
+       	 * @param keyIndexIn	the index of the corresponding letter of the key
+	 * @return newChar	the shifted char
+	 */
+	public char changeUpper(char ogChar, int keyIndexIn) {
+		int keyInt = (int)(key.charAt(keyIndex));	// ASCII of key letter
+		int shift = (keyInt - (int)('a') - 1) % LENGTH_OF_ALPHABET;
+		// how much to shift the letter by
+		
+		if (cryptNum == 1)
+			char newChar = (char)(ogChar + shift);
+		else
+			char newChar = (char)(ogChar - shift);
+		return newChar;
 	}
 }
