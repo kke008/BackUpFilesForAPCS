@@ -6,11 +6,11 @@
 */
 
 public class DiceGroup {
-	private Dice [] die;
-	private int [] rollVals;
+	private Dice [] die;	// stores the dice
+	private int [] rollVals;	// stores the values of each dice
 	private final int NUM_DICE = 5;	// number of dice that will be played with
 	
-	// Create the seven different line images of a die
+	// Creates the seven different line images of a die
 	String [] line = {	" _______ ",
 						"|       |",
 						"| O   O |",
@@ -23,8 +23,10 @@ public class DiceGroup {
 	 *  Creates a group of 5 dice
 	 */
 	public DiceGroup() {
-		// you complete
 		die = new Dice[NUM_DICE];
+		for (int i = 0; i < die.length; i++) {
+			die[i] = new Dice();
+		}
 		rollVals = new int[NUM_DICE];
 	}
 		
@@ -60,7 +62,7 @@ public class DiceGroup {
 			}
 			
 			if (isHeld == false) {
-				rollVals[k] = die[k].roll; 
+				rollVals[k] = die[k].roll(); 
 			}
 		}
 	}
