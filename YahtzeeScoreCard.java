@@ -1,11 +1,22 @@
 /**
- *	Describe the scorecard here.
+ *	Displays a table with each player's name, the 13 categories they can
+ *  score in, and their scores (if any) in each category. Sets / changes 
+ *  the score in categories selected by the players.
  *
  *	@author	Karen Ke
  *	@since	September 28, 2023
  */
 public class YahtzeeScoreCard {
 	private final int NUM_CATEGORIES = 13;	// number of categories
+	private final int INDEX_THREE_KIND = 7;	// index of Three of a Kind score
+	private final int INDEX_FOUR_KIND = 8;	// index of Four of a Kind score
+	private final int INDEX_FULL_HOUSE = 9;	// index of Full House score
+	private final int INDEX_SMALL_STRAIGHT = 10;	// index of Small
+													// Straight score
+	private final int INDEX_LARGE_STRAIGHT = 11;	// index of Large
+													// Straight score
+	private final int INDEX_CHANCE = 12;	// index of Chance score
+	private final int INDEX_YAHTZEE = 13;	// index of Yahtzee score
 	private int [] scores;	// array to keep track of category scores
 	
 	public YahtzeeScoreCard() {
@@ -57,35 +68,35 @@ public class YahtzeeScoreCard {
 	 *  @return  true if change succeeded. Returns false if choice already taken.
 	 */
 	public boolean changeScore(int choice, DiceGroup dg) {
-		boolean taken = false;
-		if (getScore(choice) != 0) {
-			if (choice < 7)
+		boolean notTaken = false;
+		if (choice > 0 && choice <= NUM_CATEGORIES && getScore(choice) != 0) {
+			if (choice < INDEX_THREE_KIND)
 				numberScore(choice, dg);
 				
-			else if (choice == 7)
-				threeOfAKind(choice, dg);
+			else if (choice == INDEX_THREE_KIND)
+				threeOfAKind(dg);
 			
-			else if (choice == 8)
-				fourOfAKind(choice, dg);
+			else if (choice == INDEX_FOUR_KIND)
+				fourOfAKind(dg);
 				
-			else if (choice == 9)
-				fullHouse(choice, dg);
+			else if (choice == INDEX_FULL_HOUSE)
+				fullHouse(dg);
 				
-			else if (choice == 10)
-				smallStraight(choice, dg);
+			else if (choice == INDEX_SMALL_STRAIGHT)
+				smallStraight(dg);
 				
-			else if (choice == 11)
-				largeStraight(choice, dg);
+			else if (choice == INDEX_LARGE_STRAIGHT)
+				largeStraight(dg);
 				
-			else if (choice == 12)
-				chance(choice, dg);
+			else if (choice == INDEX_CHANCE)
+				chance(dg);
 				
-			else if (choice == 13)
-				yahtzeeScore(choice, dg);
+			else if (choice == INDEX_YAHTZEE)
+				yahtzeeScore(dg);
 			
-			taken = true;
+			notTaken = true;
 		}
-		return taken;
+		return notTaken;
 	}
 	
 	/**
@@ -94,25 +105,71 @@ public class YahtzeeScoreCard {
 	 *  @param choice The choice of the player 1 to 6
 	 *  @param dg  The DiceGroup to score
 	 */
-	public void numberScore(int choice, DiceGroup dg) {}
+	public void numberScore(int choice, DiceGroup dg) {
+		scores[choice] = dg.getTotal();
+	}
 	
 	/**
 	 *	Updates the scorecard for Three Of A Kind choice.
 	 *
 	 *	@param dg	The DiceGroup to score
 	 */	
-	public void threeOfAKind(DiceGroup dg) {}
+	public void threeOfAKind(DiceGroup dg) {
+		scores[INDEX_THREE_KIND] = dg.getTotal();
+	}
 	
-	public void fourOfAKind(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Four Of A Kind choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void fourOfAKind(DiceGroup dg) {
+		scores[INDEX_FOUR_KIND] = dg.getTotal();
+	}
 	
-	public void fullHouse(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Full House choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void fullHouse(DiceGroup dg) {
+		scores[INDEX_FULL_HOUSE] = dg.getTotal();
+	}
 	
-	public void smallStraight(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Small Straight choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void smallStraight(DiceGroup dg) {
+		scores[INDEX_SMALL_STRAIGHT] = dg.getTotal();
+	}
 	
-	public void largeStraight(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Large Straight choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void largeStraight(DiceGroup dg) {
+		scores[INDEX_LARGE_STRAIGHT] = dg.getTotal();
+	}
 	
-	public void chance(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Chance choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void chance(DiceGroup dg) {
+		scores[INDEX_CHANCE] = dg.getTotal();
+	}
 	
-	public void yahtzeeScore(DiceGroup dg) {}
+	/**
+	 *	Updates the scorecard for Yahtzee choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void yahtzeeScore(DiceGroup dg) {
+		scores[INDEX_YAHTZEE] = dg.getTotal();
+	}
 
 }
