@@ -46,24 +46,19 @@ public class DiceGroup {
 	 *  @param rawHold	the numbered dice to hold
 	 */
 	public void rollDice(String rawHold) {
-		int hold = -1;
-		int [] held = new int[rawHold.length()];
-		
-		for (int j = 0; j < rawHold.length(); j++) {
-			hold = Integer.parseInt("" + rawHold.charAt(j));
-			held[j] = hold;
-		}
-		
-		for (int k = 0; k < NUM_DICE; k++) {
-			boolean isHeld = false;
-			for (int l = 0; l < rawHold.length(); l++) {
-				if (k == held[l])
-					isHeld = true;
+		System.out.println("\n\n" + rawHold);
+		for (int i = 1; i <= NUM_DICE; i++) {	// check if dice i is held
+			int heldNum;
+			boolean held = false;
+			for (int j = 0; j < rawHold.length(); j++) {
+				heldNum = Integer.parseInt("" + rawHold.charAt(j));
+				if (heldNum == i)
+					held = true;
 			}
 			
-			if (isHeld == false) {
-				rollVals[k] = die[k].roll(); 
-			}
+			if (!held) 
+				rollVals[heldNum - 1] = die[heldNum - 1].roll();
+				////////////////////////////////////////////////////////////////////
 		}
 	}
 	
