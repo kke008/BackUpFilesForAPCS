@@ -1,5 +1,4 @@
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.util.Scanner;
 
 /**
  *	Introduce the game here
@@ -9,28 +8,28 @@ import java.awt.event.KeyListener;
  */
  
 public class Yahtzee {
-	private final ROUNDS = 13;	// 13 rounds per game
+	private final int ROUNDS = 13;	// 13 rounds per game
+	private final int MAX_HOLD_ROUNDS = 3;	// max num of times player
+											// can hold dice
 	private YahtzeePlayer player1;	// Player 1 info
 	private DiceGroup p1Dice;	// Player 1's dice
 	private YahtzeePlayer player2;	// Player 2 info
 	private DiceGroup p2Dice;	// Player 2's dice
+	private Scanner readWait;	// Scanner to wait for players to hit enter
 	
 	public Yahtzee() {
 		 player1 = new YahtzeePlayer();
 		 p1Dice = new DiceGroup();
 		 player2 = new YahtzeePlayer();
 		 p2Dice = new DiceGroup();
+		 readWait = new Scanner(System.in);
 	}
 	
 	public static void main(String [] args) {
 		Yahtzee yz = new Yahtzee();
 		yz.printHeader();
 		yz.getPlayerNames();
-		for (int played = 1; played <= ROUNDS; played++) {
-			System.out.printf("Round %d of %d rounds.\n\n", played, ROUNDS);
-			yz.playRound(player1, p1Dice);
-			yz.playRound(player2, p2Dice);
-		}
+		yz.playGame();
 		//yz.winner();
 	}
 	
@@ -74,19 +73,23 @@ public class Yahtzee {
 		while (p1Total == p2Total) {
 			System.out.printf("\n\nLet's see who will go first. %s please hit " +
 				"enter to roll the dice :", p1Name);
+			while (!readWait.hasNextLine()) {}
+			readWait.nextLine();
 			p1Dice.rollDice();
 			p1Dice.printDice();
 			p1Total = p1Dice.getTotal();
 			
 			System.out.printf("\n\n%s, it's your turn. Please hit enter to roll" +
 				" the dice :", p2Name);
+			while (!readWait.hasNextLine()) {}
+			readWait.nextLine();
 			p2Dice.rollDice();
 			p2Dice.printDice();
 			p2Total = p2Dice.getTotal();
 			
 			if (p1Total == p2Total)
 				System.out.printf("\n\nWhoops, we have a tie (both rolled " +
-					"%d. Looks like we'll have to try that again...", p1Total);
+					"%d). Looks like we'll have to try that again...", p1Total);
 		}
 		
 		System.out.printf("\n\n%s, you rolled a sum of %d, and %s, you " +
@@ -114,28 +117,44 @@ public class Yahtzee {
 	}
 	*/
 	
-	/**	Method where each round of the game (13 total) is played. The
-	 * 	player rolls their dice a max of 3 times and chooses which dice 
-	 *  to hold each time, then they choose which category to put their 
-	 *  score in. 
+	/** Runs 13 rounds of the game.
 	 */
-	public void playRound(YahtzeePlayer player, DiceGroup playerDice) {
+	public void playGame() {
+		for (int played = 1; played <= ROUNDS; played++) {
+			System.out.printf("Round %d of %d rounds.\n\n", played, ROUNDS);
+			playRound(player1, p1Dice);
+			playRound(player2, p2Dice);
+		}
+	}
+	
+	/**	Method where each round of the game  is played. The player rolls 
+	 *  their dice a max of 3 times and chooses which dice to hold each 
+	 *  time, then they choose which category to put their score in. 
+	 */
+	public void playRound(YahtzeePlayer player, DiceGroup dg) {
 			System.out.printf("%s, it's your turn to play. Please hit " +
 				"enter to roll the dice :\n\n", player.getName());
-			playerDice.rollDice();
-			playerDice.printDice();
-			String hold = "";
-			hold = Prompt.getString("Which di(c)e would you like to keep? " +
-				"Enter the values you'd like to 'hold' without spaces. " +
-				"For examples, if you'd like to 'hold' die 1, 2, and 5, " +
-				"enter 125\n(enter -1 if you'd like to end the turn)\n");
+			while (!readWait.hasNextLine()) {}
+			readWait.nextLine();
+			dg.rollDice();
+			dg.printDice();
+			for (int i = 0; i < MAX_HOLD_ROUNDS; i++) {
+				String hold = "";
+				hold = Prompt.getString("Which di(c)e would you like to keep? " +
+					"Enter the values you'd like to 'hold' without spaces. " +
+					"For examples, if you'd like to 'hold' die 1, 2, and 5, " +
+					"enter 125\n(enter -1 if you'd like to end the turn)\n");
+				if (Integer.parseInt(hold) != -1) {
+					dg.rollDice(hold);
+					dg.printDice();
+				}
+			}
 			/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		}
 	}
 	
 	/** Totals players' scores to figure out who won, and tells them.
 	 */
-	public void winner() {
+	//public void winner() {
 		
-	}
+	//}
 }
