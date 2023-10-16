@@ -194,19 +194,18 @@ public class Wordle
 	 *	Returns true if the word is in the file, false otherwise.
 	 *	@param possibleWord       the word to looked for in words5allowed.txt
 	 *	@return                   true if the word is in the text file, false otherwise
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
 	public boolean inAllowedWordFile(String possibleWord)
 	{
 		Scanner readFile = FileUtils.openToRead(WORDS5_ALLOWED);
 		String wordInFile = "";
+		boolean isAllowed = false;
 		while (readFile.hasNext() && !(possibleWord.equals(wordInFile))) {
 			wordInFile = readFile.hasNext()
+			if (possibleWord.equalsIgnoreCase(wordInFile))
+				isAllowed = true;
 		}
-		if (possibleWord.equals(wordInFile))
-			return true;
-			
-		return false;
+		return isAllowed;
 	}
 	
 	/** 
@@ -222,21 +221,28 @@ public class Wordle
 	{
 
 		letters = letters.toUpperCase();
-		
 		// if guess is in words5allowed.txt then put into guess list
-		int guessNumber = 0;
-		for(int i = 0; i < wordGuess.length; i++)
-		{
-			if(wordGuess[i].length() == 5)
+		if (inAllowedWordFile(letters)) {
+			int guessNumber = 0;
+			for(int i = 0; i < wordGuess.length; i++)
 			{
-				guessNumber = i + 1;
+				if(wordGuess[i].length() == 5)
+				{
+					guessNumber = i + 1;
+				}
 			}
+			
+			wordGuess[guessNumber] = letters.toUpperCase();
+			letters = "";
 		}
-		wordGuess[guessNumber] = letters.toUpperCase();
-		letters = "";
 		
 		// else if guess is not in words5allowed.txt then print dialog box
-
+		else {
+			JOptionPane dPane = new JOptionPane(letters + " is not in word list.");
+			JDialog dBox = pane.createDialog(null, "INVALID INPUT");
+			d.setLocation(365,250);
+			d.setVisible(true);	
+		}
 	}
 	
 	/** 
@@ -253,10 +259,25 @@ public class Wordle
 		// Determine color of guessed letters and draw backgrounds
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
-
-
-
-
+		int colorNum = 0;
+		for (int i = 0; i < letters.length(); i++)
+		{
+			char letter = letters.charAt(i);
+			for (int j = 0; j < word.length(); j++)
+			{
+				char wordLetter = word.charAt(j);
+				if (wordLetter == letter)
+				{
+					if (i == j)
+						colorNum = 3;
+						
+					else
+						colorNum = 2;
+				}
+				else
+					colorNum = 1;
+			}
+		}
 		
 		for(int row = 0; row < 6; row++)
 		{
@@ -288,8 +309,18 @@ public class Wordle
 			{
 				StdDraw.picture(pair[0], pair[1], "keyBackgroundBig.png");		
 			}						
-			//  This needs to be modified a great deal,
-			//  so that the correct colors show up.
+			else if (colorNum == 1)
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundDarkGray.png");		
+			}
+			else if (colorNum == 2)
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundYellow.png");		
+			}
+			else if (colorNum == 3)
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundGreen.png");		
+			}
 			else
 			{
 				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
@@ -345,9 +376,8 @@ public class Wordle
 	 *	enters the correct word with a guess.  The game is lost when the user does
 	 *	not enter the correct word with the last (6th) guess.  An appropriate message
 	 *	is displayed to the user in the form of a JOptionPane with JDialog for a win or a loss.
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	public void checkIfWonOrLost ( )/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void checkIfWonOrLost ()
 	{
 
 		String lastWord = "";
@@ -363,17 +393,24 @@ public class Wordle
 		if(lastWord.equals(word))
 		{
 			activeGame = false;
-			JOptionPane pane = new JOptionPane(lastWord + " is the word!  Press RESET to begin again");
+			JOptionPane pane = new JOptionPane(lastWord + " is the word!" +
+				" Press RESET to begin again");
 			JDialog d = pane.createDialog(null, "CONGRATULATIONS!");
 			d.setLocation(365,250);
 			d.setVisible(true);
 		}
 		
 		// else if all guesses are filled then declare loser
-		
-		
-		
-		
+		else if (lastWord.equals(wordGuess[wordGuess.length - 1]))
+		{
+			String actualWord = word.toUpperCase();
+			activeGame = false;
+			JOptionPane pane = new JOptionPane(actualWord + " was the " + 
+				"word.  Press RESET to begin again");
+			JDialog d = pane.createDialog(null, "Sorry!");
+			d.setLocation(365,250);
+			d.setVisible(true);
+		}
 	}
 	
 	/** 
