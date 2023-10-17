@@ -251,31 +251,39 @@ public class Wordle
 	 *	of the gameboard.  The correct colors will need to be chosen for every letter.
 	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	public void drawPanel ( )/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void drawPanel ()
 	{
-
 		StdDraw.clear(StdDraw.WHITE);
 		
 		// Determine color of guessed letters and draw backgrounds
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
-		int colorNum = 0;
+		
+		int [] lettersColors = new int[5];	// colors of each letter of the guess
+		
 		for (int i = 0; i < letters.length(); i++)
 		{
 			char letter = letters.charAt(i);
+			int letterIndex = -1;
+			for (int h = 0; h < Constants.KEYBOARD.length; h++)
+			{
+				if (Constants.KEYBOARD[h] == letter)
+					letterIndex = h;
+			}
+			
 			for (int j = 0; j < word.length(); j++)
 			{
 				char wordLetter = word.charAt(j);
 				if (wordLetter == letter)
 				{
 					if (i == j)
-						colorNum = 3;
-						
+						keyBoardColors[letterIndex] = lettersColors[i] = 3;
+							
 					else
-						colorNum = 2;
+						keyBoardColors[letterIndex] = lettersColors[i] = 2;
 				}
 				else
-					colorNum = 1;
+					keyBoardColors[letterIndex] = lettersColors[i] = 1;
 			}
 		}
 		
@@ -283,14 +291,23 @@ public class Wordle
 		{
 			for(int col = 0; col < 5; col++)
 			{
+				String picName = "letterFrame";
 				if(wordGuess[row].length() != 0)											//  THIS METHOD IS INCOMPLETE.
 				{
-					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
+					if (lettersColors[col] == 1)
+						picName += "DarkGray.png";
+					
+					else if (lettersColors[col] == 2)
+						picName += "Yellow.png";
+					
+					else if (lettersColors[col] == 3)
+						picName += "Green.png";
 				}
 				else
 				{
-					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrame.png");
+					picName += "png";
 				}
+				StdDraw.picture(209 + col * 68, 650 - row * 68, picName);
 			}
 		}
 		
@@ -309,21 +326,19 @@ public class Wordle
 			{
 				StdDraw.picture(pair[0], pair[1], "keyBackgroundBig.png");		
 			}						
-			else if (colorNum == 1)
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundDarkGray.png");		
-			}
-			else if (colorNum == 2)
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundYellow.png");		
-			}
-			else if (colorNum == 3)
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundGreen.png");		
-			}
 			else
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
+			{	
+				String picName = "keyBackground";
+				if (keyBoardColors[place] == 1)
+					picName += "DarkGrey";
+					
+				else if (keyBoardColors[place] == 2)
+					picName += "Yellow";
+					
+				else if (keyBoardColors[place] == 3)
+					picName += "Green";
+					
+				StdDraw.picture(pair[0], pair[1], picName + ".png");
 			}
 			StdDraw.setPenColor(StdDraw.BLACK);
 			StdDraw.text(pair[0], pair[1], Constants.KEYBOARD[place]);
