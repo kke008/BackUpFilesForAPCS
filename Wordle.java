@@ -95,7 +95,7 @@ public class Wordle
 	 *	(the game of Wordle) runs.
 	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	public static void main(String[] args)/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static void main(String[] args)
 	{
 
 		String testWord = new String("");
@@ -104,13 +104,11 @@ public class Wordle
 		// Determines if args[0] and args[1] are set
 		// args[0] is "show" which means to show the word chosen
 		// args[1] is a word which is used as the chosen word
-		if (args.length >= 1)
-			testWord = args[0];
-		
-		if (args.length >= 2)
-			showIt = args[1];
-
-
+		if (args.length >= 1) {
+			showIt = args[0];
+			if (args.length >= 2)
+				testWord = args[1];
+		}
 
 		Wordle run = new Wordle(showIt, testWord);
 		run.setUpCanvas();
@@ -176,12 +174,12 @@ public class Wordle
 				numWordsPossible++;
 				readWord.nextLine();
 			}
-			readWord.close()
+			readWord.close();
 			
-			Scanner readWord = FileUtils.openToRead(inFileName);
+			Scanner read = FileUtils.openToRead(inFileName);
 			int randomWordIndex = (int)(Math.random() * numWordsPossible);
 			for (int i = 0; i < randomWordIndex; i++) {
-				result = readWord.nextLine();
+				result = read.nextLine();
 			}
 		}
 		
@@ -201,7 +199,7 @@ public class Wordle
 		String wordInFile = "";
 		boolean isAllowed = false;
 		while (readFile.hasNext() && !(possibleWord.equals(wordInFile))) {
-			wordInFile = readFile.hasNext()
+			wordInFile = readFile.next();
 			if (possibleWord.equalsIgnoreCase(wordInFile))
 				isAllowed = true;
 		}
@@ -217,7 +215,7 @@ public class Wordle
 	 *	form of a JOptionPane with JDialog.
 	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
-	public void processGuess ( )/////////////////////////////////////////////////////////////////////////////////////////////////////
+	public void processGuess ( )
 	{
 
 		letters = letters.toUpperCase();
@@ -239,9 +237,9 @@ public class Wordle
 		// else if guess is not in words5allowed.txt then print dialog box
 		else {
 			JOptionPane dPane = new JOptionPane(letters + " is not in word list.");
-			JDialog dBox = pane.createDialog(null, "INVALID INPUT");
-			d.setLocation(365,250);
-			d.setVisible(true);	
+			JDialog dBox = dPane.createDialog(null, "INVALID INPUT");
+			dBox.setLocation(365,250);
+			dBox.setVisible(true);	
 		}
 	}
 	
@@ -267,7 +265,7 @@ public class Wordle
 			int letterIndex = -1;
 			for (int h = 0; h < Constants.KEYBOARD.length; h++)
 			{
-				if (Constants.KEYBOARD[h] == letter)
+				if (Constants.KEYBOARD[h].equalsIgnoreCase("" + letter))
 					letterIndex = h;
 			}
 			
@@ -305,7 +303,7 @@ public class Wordle
 				}
 				else
 				{
-					picName += "png";
+					picName += ".png";
 				}
 				StdDraw.picture(209 + col * 68, 650 - row * 68, picName);
 			}
@@ -394,13 +392,14 @@ public class Wordle
 	 */
 	public void checkIfWonOrLost ()
 	{
-
 		String lastWord = "";
+		int numGuesses = 0;
 		for(int i = 0; i < wordGuess.length; i++)
 		{
 			if(wordGuess[i].length() == 5)
 			{
 				lastWord = wordGuess[i];
+				numGuesses++;
 			}
 		}
 		
@@ -416,7 +415,8 @@ public class Wordle
 		}
 		
 		// else if all guesses are filled then declare loser
-		else if (lastWord.equals(wordGuess[wordGuess.length - 1]))
+		else if (numGuesses == wordGuess.length &&
+			lastWord.equals(wordGuess[wordGuess.length - 1]))
 		{
 			String actualWord = word.toUpperCase();
 			activeGame = false;
