@@ -162,10 +162,12 @@ public class Wordle
 	 */
 	public String openFileAndChooseWord(String inFileName, String testWord)
 	{
-		boolean wordIsAllowed = inAllowedWordFile(testWord);
+		boolean isWordAllowed = inAllowedWordFile(testWord);
 		String result = "";
-		if (wordIsAllowed)
+		if (isWordAllowed) {
 			result = testWord;
+			System.out.println("\n" + testWord + "\n");
+		}
 			
 		else {
 			Scanner readWord = FileUtils.openToRead(inFileName);
@@ -181,6 +183,7 @@ public class Wordle
 			for (int i = 0; i < randomWordIndex; i++) {
 				result = read.nextLine();
 			}
+			read.close();
 		}
 		
 		return result;
@@ -229,8 +232,8 @@ public class Wordle
 					guessNumber = i + 1;
 				}
 			}
-			
-			wordGuess[guessNumber] = letters.toUpperCase();
+			wordGuess[guessNumber] = letters;
+			drawPanel();
 			letters = "";
 		}
 		
@@ -241,6 +244,7 @@ public class Wordle
 			dBox.setLocation(365,250);
 			dBox.setVisible(true);	
 		}
+		readyForKeyInput = true;///////////////////////////////////////////////////////////////////////////
 	}
 	
 	/** 
@@ -256,56 +260,56 @@ public class Wordle
 		// Determine color of guessed letters and draw backgrounds
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
+		int [] keyBoardColors = new int[Constants.KEYBOARD.length];
 		
-		int [] lettersColors = new int[5];	// colors of each letter of the guess
-		
-		for (int i = 0; i < letters.length(); i++)
-		{
-			char letter = letters.charAt(i);
-			int letterIndex = -1;
-			for (int h = 0; h < Constants.KEYBOARD.length; h++)
-			{
-				if (Constants.KEYBOARD[h].equalsIgnoreCase("" + letter))
-					letterIndex = h;
-			}
-			
-			for (int j = 0; j < word.length(); j++)
-			{
-				char wordLetter = word.charAt(j);
-				if (wordLetter == letter)
-				{
-					if (i == j)
-						keyBoardColors[letterIndex] = lettersColors[i] = 3;
-							
-					else
-						keyBoardColors[letterIndex] = lettersColors[i] = 2;
+		for (int i = 0; i < wordGuess.length; i++) {	// running through guess
+			String guess = wordGuess[i];
+			for (int j = 0; j < 5; j++) {	// running through chars of guess
+				String letter = "" + guess.charAt(j);
+				int letterIndex = 0;
+				
+				for (int a = 0; a < Constants.KEYBOARD.length; a++) {
+					if (letter.equalsIgnoreCase(Constants.KEYBOARD[a]);
+						letterIndex = a;
 				}
-				else
-					keyBoardColors[letterIndex] = lettersColors[i] = 1;
+				
+				for (int k = 0; k < word.length(); k++) {	// through word
+					int keyColorNum = 0;
+					if (word.indexOf(letter) == -1)
+						keyColorNum = 1;
+					else if (word.indexOf(letter) == j)
+						keyColorNum = 3;
+					else if (word.indexOf(letter) != -1)
+						keyColorNum = 2;
+						
+					keyBoardColors[letterIndex] = keyColorNum;
+				}
 			}
 		}
 		
 		for(int row = 0; row < 6; row++)
 		{
+			String guess = wordGuess[row];
 			for(int col = 0; col < 5; col++)
 			{
-				String picName = "letterFrame";
-				if(wordGuess[row].length() != 0)											//  THIS METHOD IS INCOMPLETE.
+				String guessLetter = "" + guess.charAt(col);/////////////////////////////////////////
+				/* need to get index of letter in keyboardcolors then set instead of useing letterColors
+				 * or make lettersColors first.
+				 */
+				if(wordGuess[row].length() != 0)
 				{
+					String picName = "letterFrame.png";
 					if (lettersColors[col] == 1)
-						picName += "DarkGray.png";
+						picName = "letterFrameDarkGray.png";
 					
 					else if (lettersColors[col] == 2)
-						picName += "Yellow.png";
+						picName = "letterFrameYellow.png";
 					
 					else if (lettersColors[col] == 3)
-						picName += "Green.png";
+						picName = "letterFrameGreen.png";
+						
+					StdDraw.picture(209 + col * 68, 650 - row * 68, picName);
 				}
-				else
-				{
-					picName += ".png";
-				}
-				StdDraw.picture(209 + col * 68, 650 - row * 68, picName);
 			}
 		}
 		
@@ -328,7 +332,7 @@ public class Wordle
 			{	
 				String picName = "keyBackground";
 				if (keyBoardColors[place] == 1)
-					picName += "DarkGrey";
+					picName += "DarkGray";
 					
 				else if (keyBoardColors[place] == 2)
 					picName += "Yellow";
@@ -415,7 +419,7 @@ public class Wordle
 		}
 		
 		// else if all guesses are filled then declare loser
-		else if (numGuesses == wordGuess.length &&
+		else if (numGuesses == wordGuess.length - 1 &&
 			lastWord.equals(wordGuess[wordGuess.length - 1]))
 		{
 			String actualWord = word.toUpperCase();
