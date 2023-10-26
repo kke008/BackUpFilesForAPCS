@@ -233,7 +233,6 @@ public class Wordle
 				}
 			}
 			wordGuess[guessNumber] = letters;
-			drawPanel();
 			letters = "";
 		}
 		
@@ -260,55 +259,47 @@ public class Wordle
 		// Determine color of guessed letters and draw backgrounds
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
-		int [] keyBoardColors = new int[Constants.KEYBOARD.length];
 		
-		for (int i = 0; i < wordGuess.length; i++) {	// running through guess
-			String guess = wordGuess[i];
-			for (int j = 0; j < 5; j++) {	// running through chars of guess
-				String letter = "" + guess.charAt(j);
-				int letterIndex = 0;
+		String keysInOrder = "";
+		for (int j = 0; j < Constants.KEYBOARD.length; j++) {
+			keysInOrder += Constants.KEYBOARD[j];
+		}
+		
+		for (int i = 0; i < letters.length(); i++) {
+			char c = letters.charAt(i);
+			int cIndex = keysInOrder.indexOf(c);
 				
-				for (int a = 0; a < Constants.KEYBOARD.length; a++) {
-					if (letter.equalsIgnoreCase(Constants.KEYBOARD[a]);
-						letterIndex = a;
-				}
+			if (word.charAt(i) == c)
+				keyBoardColors[cIndex] = 3;
 				
-				for (int k = 0; k < word.length(); k++) {	// through word
-					int keyColorNum = 0;
-					if (word.indexOf(letter) == -1)
-						keyColorNum = 1;
-					else if (word.indexOf(letter) == j)
-						keyColorNum = 3;
-					else if (word.indexOf(letter) != -1)
-						keyColorNum = 2;
-						
-					keyBoardColors[letterIndex] = keyColorNum;
-				}
-			}
+			else if (word.indexOf(c) != -1)
+				keyBoardColors[cIndex] = 2;
+			
+			else if (word.indexOf(c) == -1)
+				keyBoardColors[cIndex] = 1;
 		}
 		
 		for(int row = 0; row < 6; row++)
 		{
-			String guess = wordGuess[row];
 			for(int col = 0; col < 5; col++)
 			{
-				String guessLetter = "" + guess.charAt(col);/////////////////////////////////////////
-				/* need to get index of letter in keyboardcolors then set instead of useing letterColors
-				 * or make lettersColors first.
-				 */
 				if(wordGuess[row].length() != 0)
 				{
-					String picName = "letterFrame.png";
-					if (lettersColors[col] == 1)
-						picName = "letterFrameDarkGray.png";
+					char c = wordGuess[row].charAt(col);
+					int cIndex = keysInOrder.indexOf(c);
 					
-					else if (lettersColors[col] == 2)
-						picName = "letterFrameYellow.png";
+					if (keyBoardColors[cIndex] == 1)
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
 					
-					else if (lettersColors[col] == 3)
-						picName = "letterFrameGreen.png";
-						
-					StdDraw.picture(209 + col * 68, 650 - row * 68, picName);
+					else if (keyBoardColors[cIndex] == 2)
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameYellow.png");
+					
+					else if (keyBoardColors[cIndex] == 3)
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameGreen.png");
+				}
+				else
+				{
+					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrame.png");
 				}
 			}
 		}
@@ -326,21 +317,22 @@ public class Wordle
 		{
 			if(place == 19 || place == 27 || place == 28)
 			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundBig.png");		
-			}						
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundBig.png");
+			}
+			
+			else if (keyBoardColors[place] == 2)
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundYellow.png");
+			}
+			
+			else if (keyBoardColors[place] == 3)
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackgroundGreen.png");
+			}
+			
 			else
-			{	
-				String picName = "keyBackground";
-				if (keyBoardColors[place] == 1)
-					picName += "DarkGray";
-					
-				else if (keyBoardColors[place] == 2)
-					picName += "Yellow";
-					
-				else if (keyBoardColors[place] == 3)
-					picName += "Green";
-					
-				StdDraw.picture(pair[0], pair[1], picName + ".png");
+			{
+				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
 			}
 			StdDraw.setPenColor(StdDraw.BLACK);
 			StdDraw.text(pair[0], pair[1], Constants.KEYBOARD[place]);
