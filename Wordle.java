@@ -1,3 +1,10 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
+
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;
@@ -166,7 +173,6 @@ public class Wordle
 		String result = "";
 		if (isWordAllowed) {
 			result = testWord;
-			System.out.println("\n" + testWord + "\n");
 		}
 			
 		else {
@@ -186,6 +192,9 @@ public class Wordle
 			read.close();
 		}
 		
+		if (show)
+			System.out.println("\n" + result + "\n");
+			
 		return result;
 	}
 
@@ -193,6 +202,7 @@ public class Wordle
 	 *	Checks to see if the word in the parameter list is found in the text file
 	 *	words5allowed.txt
 	 *	Returns true if the word is in the file, false otherwise.
+	 *  Changes the color of the letter in keyBoardColors accordingly.
 	 *	@param possibleWord       the word to looked for in words5allowed.txt
 	 *	@return                   true if the word is in the text file, false otherwise
 	 */
@@ -206,6 +216,7 @@ public class Wordle
 			if (possibleWord.equalsIgnoreCase(wordInFile))
 				isAllowed = true;
 		}
+		
 		return isAllowed;
 	}
 	
@@ -220,7 +231,6 @@ public class Wordle
 	 */
 	public void processGuess ( )
 	{
-
 		letters = letters.toUpperCase();
 		// if guess is in words5allowed.txt then put into guess list
 		if (inAllowedWordFile(letters)) {
@@ -243,7 +253,6 @@ public class Wordle
 			dBox.setLocation(365,250);
 			dBox.setVisible(true);	
 		}
-		readyForKeyInput = true;///////////////////////////////////////////////////////////////////////////
 	}
 	
 	/** 
@@ -260,25 +269,26 @@ public class Wordle
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
 		
-		String keysInOrder = "";
-		for (int j = 0; j < Constants.KEYBOARD.length; j++) {
-			keysInOrder += Constants.KEYBOARD[j];
+		word = word.toUpperCase();
+		
+		// setting colors for keyboard:
+		if (letters.length() == 5) {	
+			for (int i = 0; i < letters.length(); i++) {
+				char c = letters.charAt(i);
+				int cIndex = getCharIndex(c);
+					
+				if (word.charAt(i) == c)
+					keyBoardColors[cIndex] = 3;
+					
+				else if (word.indexOf(c) != -1)
+					keyBoardColors[cIndex] = 2;
+				
+				else if (word.indexOf(c) == -1)
+					keyBoardColors[cIndex] = 1;
+			}
 		}
 		
-		for (int i = 0; i < letters.length(); i++) {
-			char c = letters.charAt(i);
-			int cIndex = keysInOrder.indexOf(c);
-				
-			if (word.charAt(i) == c)
-				keyBoardColors[cIndex] = 3;
-				
-			else if (word.indexOf(c) != -1)
-				keyBoardColors[cIndex] = 2;
-			
-			else if (word.indexOf(c) == -1)
-				keyBoardColors[cIndex] = 1;
-		}
-		
+		// finding color of each letter in guess and drawing them
 		for(int row = 0; row < 6; row++)
 		{
 			for(int col = 0; col < 5; col++)
@@ -286,17 +296,18 @@ public class Wordle
 				if(wordGuess[row].length() != 0)
 				{
 					char c = wordGuess[row].charAt(col);
-					int cIndex = keysInOrder.indexOf(c);
+					int cIndex = getCharIndex(c);
 					
-					if (keyBoardColors[cIndex] == 1)
+					if (word.indexOf(c) == -1)
 						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
 					
-					else if (keyBoardColors[cIndex] == 2)
-						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameYellow.png");
-					
-					else if (keyBoardColors[cIndex] == 3)
+					else if (c == word.charAt(col))
 						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameGreen.png");
+					
+					else if (word.indexOf(c) != -1)
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameYellow.png");
 				}
+				
 				else
 				{
 					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrame.png");
@@ -315,23 +326,59 @@ public class Wordle
 		String tempWord = "";
 		for(int [] pair : Constants.KEYPLACEMENT)
 		{
+			int tempWordIndex = -1;
+			for (int l = 0; l < wordGuess.length; l++) {	// getting last guess
+				if (wordGuess[l].length() > 0) {
+					tempWord = wordGuess[l];
+					tempWordIndex = l;
+				}
+			}
+			
 			if(place == 19 || place == 27 || place == 28)
 			{
 				StdDraw.picture(pair[0], pair[1], "keyBackgroundBig.png");
 			}
 			
-			else if (keyBoardColors[place] == 2)
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundYellow.png");
-			}
-			
-			else if (keyBoardColors[place] == 3)
-			{
-				StdDraw.picture(pair[0], pair[1], "keyBackgroundGreen.png");
+			else if (inAllowedWordFile(tempWord)) {
+				if (keyBoardColors[place] == 2)
+				{
+					StdDraw.picture(pair[0], pair[1], "keyBackgroundYellow.png");
+				}
+				
+				else if (keyBoardColors[place] == 3)
+				{
+					StdDraw.picture(pair[0], pair[1], "keyBackgroundGreen.png");
+				}
+				
+				else if (keyBoardColors[place] == 1)
+				{
+					StdDraw.picture(pair[0], pair[1], "keyBackgroundDarkGray.png");
+				}
+				
+				else
+				{
+					StdDraw.picture(pair[0], pair[1], "keyBackground.png");
+				}
 			}
 			
 			else
 			{
+				/*for (int z = 0; z < tempWord.length(); z++) {
+					char tempChar = tempWord.charAt(z);
+					boolean charIsElsewhere = false;
+					for (int y = 0; y < tempWordIndex; y++) {
+						for (int w = 0; w < 5; w++) {
+							char checkChar = wordGuess[y].charAt(w);
+							if (tempChar == checkChar)
+								charIsElsewhere = true;
+						}
+					}
+					if (!charIsElsewhere) {
+						int tempCharIndex = getCharIndex(tempChar);
+						keyBoardColors[tempCharIndex] = 0;
+					}
+				}
+				*/
 				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
 			}
 			StdDraw.setPenColor(StdDraw.BLACK);
@@ -347,6 +394,21 @@ public class Wordle
 		
 		// check if won or lost
 		checkIfWonOrLost();
+	} 
+	
+	/**
+	 * Called by drawPanel to find the index in KEYBOARD from the Constants
+	 * class of a certain letter.
+	 * @param c			the letter whose index is being looked for
+	 * @return cIndex	the index of c in KEYBOARD
+	 */
+	public int getCharIndex(char c) {
+		int cIndex = 0;
+		for (int a = 0; a < Constants.KEYBOARD.length; a++) {
+			if (Constants.KEYBOARD[a].equalsIgnoreCase("" + c))
+				cIndex = a;		
+		}
+		return cIndex;
 	}
 	
 	/** 
