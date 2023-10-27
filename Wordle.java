@@ -1,10 +1,3 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-
-
 import java.util.List;
 import java.util.ArrayList;
 import java.awt.Color;
@@ -100,7 +93,6 @@ public class Wordle
 	 *	The main method, to run the program.  The constructor is called, so that
 	 *	all of the fields are initialized.  The canvas is set up, and the GUI
 	 *	(the game of Wordle) runs.
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
 	public static void main(String[] args)
 	{
@@ -165,7 +157,6 @@ public class Wordle
 	 *	@param testWord			if this String is found in words5allowed.txt, it
 	 *							will be used to set word.
 	 *	@return	result			the word chosen as the "goal word".
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
 	public String openFileAndChooseWord(String inFileName, String testWord)
 	{
@@ -227,7 +218,6 @@ public class Wordle
 	 *	inAllowedWordFile will be called for this task.  If the guess in letters
 	 *	does not exist in the text file, a message is displayed to the user in the
 	 *	form of a JOptionPane with JDialog.
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
 	public void processGuess ( )
 	{
@@ -259,7 +249,6 @@ public class Wordle
 	 *	Draws the entire game panel.  This includes the guessed words, the current
 	 *	word being guessed, and all of the letters in the "keyboard" at the bottom
 	 *	of the gameboard.  The correct colors will need to be chosen for every letter.
-	 *	THIS METHOD IS INCOMPLETE.	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	 */
 	public void drawPanel ()
 	{
@@ -362,23 +351,7 @@ public class Wordle
 			}
 			
 			else
-			{
-				/*for (int z = 0; z < tempWord.length(); z++) {
-					char tempChar = tempWord.charAt(z);
-					boolean charIsElsewhere = false;
-					for (int y = 0; y < tempWordIndex; y++) {
-						for (int w = 0; w < 5; w++) {
-							char checkChar = wordGuess[y].charAt(w);
-							if (tempChar == checkChar)
-								charIsElsewhere = true;
-						}
-					}
-					if (!charIsElsewhere) {
-						int tempCharIndex = getCharIndex(tempChar);
-						keyBoardColors[tempCharIndex] = 0;
-					}
-				}
-				*/
+      {
 				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
 			}
 			StdDraw.setPenColor(StdDraw.BLACK);
