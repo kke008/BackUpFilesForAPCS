@@ -1,4 +1,3 @@
-import java.lang.Character;
 /**
  *	Utilities for handling HTML
  *
