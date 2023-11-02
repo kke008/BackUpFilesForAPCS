@@ -1,3 +1,4 @@
+import java.lang.Character;
 /**
  *	Utilities for handling HTML
  *
@@ -6,13 +7,6 @@
  */
 public class HTMLUtilities {
 	
-	public static void main (String[] args) {	////////////////////////////////////
-		HTMLUtilities h = new HTMLUtilities();
-		String[] hh = h.tokenizeHTMLString("<abc>cd-e");
-		for (int z = 0; z < hh.length; z++) {
-			System.out.println(hh[z]);
-		}
-	}
 	/**
 	 *	Break the HTML string into tokens. The array returned is
 	 *	exactly the size of the number of tokens in the HTML string.
@@ -26,37 +20,62 @@ public class HTMLUtilities {
 		String[] result = new String[10000];
 		
 		int index = 0;	// index in result that next token will be added at
+		int strIndex = 0;	// index of character being checked in str
 		String tempString = "";
 		
 		boolean isTag = false;
 		boolean isWord = false;
+		boolean isPunctuation = false;
+		boolean isTokenDone = false;
 		
-		for (int a = 0; a < str.length(); a++) {
-			char c = str.charAt(a);
-			if (!isWhitespace(c))
-				tempString += c;
-						
+		while (strIndex < str.length()) {
+			char c = str.charAt(strIndex);
+			char nextC = ' ';
+			if (strIndex < str.length() - 1) {
+				nextC = str.charAt(strIndex + 1);
+			
 			if (c == '<')
 				isTag = true;
 				
-			else if (!isTag && isLetter(c))
-				isWord = true;
+			else if (!isTag) {
+				if (c < 'A' || c > 'Z' && c < 'a' || c > 'z')
+					isWord = true;
 				
-			if (isTag) {		// tokenize tags
+				else if (findIfPunctuation(c)) {
+					if (!(c == '-' && nextC != ' '))
+						isPunctuation = true;
+				}
+			}
+				
+			if (isTag) {				// tokenizes tags
+				tempString += c;
 				if (c == '>') {
-					result[index] = tempString;
-					index++;
-					tempString = "";
-					isTag = false;
+					isTokenDone = true;
 				}
 			}
 			
-			//else if (isWord){		// tokenize words
-			//}
-			
-			if (a == str.length - 1) {
+			else if (isWord) {			// tokenizes words
 				tempString += c;
+				if ((nextC < 'A' || nextC > 'Z' && nextC < 'a' || 
+						nextC > 'z') && nextC != '-')
+					isTokenDone = true;
+			}
+			
+			else if (isPunctuation) {
+				tempString = c;
+				isTokenDone = true;
+			}
+			
+			strIndex++;
+			
+			// when token is done, it's added to result and everything is reset
+			if (isTokenDone) {
+				isTag = false;
+				isWord = false;
+				isTokenDone = false;
 				result[index] = tempString;
+				tempString = "";
+				index++;
 			}
 		}
 		
@@ -72,6 +91,22 @@ public class HTMLUtilities {
 			fixedResult[j] = result[j];
 		}
 		return fixedResult;
+	}
+	
+	/**
+	 *  Sees if the character passed in is one of the possible punctuation.
+	 * 	@param charIn			the character to check
+	 * 	@return isPunctuation	true if char is punctuation, otherwise false
+	 */
+	public boolean findIfPunctuation(char charIn) {
+		boolean isPuctuation = false;
+		char[] punctuation = {'.', ',', ';', ':', '(', ')', '?', '!', 
+				'=', '&', '~', '+', '-'};
+		for (int i = 0; i < punctuation.length; i++) {
+			if (charIn == punctuation[i])
+				isPunctuation = true;
+		}
+		return isPunctuation;
 	}
 	
 	/**
