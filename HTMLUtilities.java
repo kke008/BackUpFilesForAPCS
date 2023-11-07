@@ -30,9 +30,7 @@ public class HTMLUtilities {
 		
 		while (strIndex < str.length()) {
 			char c = str.charAt(strIndex);
-			//System.out.println(c + ":\t" + isTag + "\t" + isWord + "\t" + isPunctuation);	/////////////////////////////////////////////
 			char nextC = ' ';
-			String forEInNums = "";
 			if (strIndex < str.length() - 1) {
 				nextC = str.charAt(strIndex + 1);
 			}
@@ -41,44 +39,69 @@ public class HTMLUtilities {
 				isTag = true;
 			
 			else if (!isTag) {
-				if (Character.isLetter(c) && !isNumber)
+				if (!isNumber && Character.isLetter(c))
 					isWord = true;
 				
-				else if (Character.isDigit(c) || c == '-' && Character.isDigit(nextC))
+				else if (Character.isDigit(c) || c == '-' && 
+					Character.isDigit(nextC))
 					isNumber = true;
+					
+				else if (findIfPunctuation(c) && !isWord && !isNumber)
+					isPunctuation = true;
 			}
 				
 			if (isTag) {				// tokenizes tags
-				tempString += c;
-				if (c == '>') {
-					isTag = false;
+				if (isWord || isNumber) {
+					isWord = false;
+					isNumber = false;
 					isTokenDone = true;
+					strIndex--;
+				}
+				
+				else {
+					tempString += c;
+					if (c == '>') {
+						isTag = false;
+						isTokenDone = true;
+					}
 				}
 			}
 			
 			else if (isWord) {				// tokenizes words
-				tempString += c;
-				if (!(Character.isLetter(nextC) || (c == '-' && 
-										!findIfPunctuation(str, strIndex)))) {
+				if (Character.isLetter(c) || c == '-' &&
+					Character.isLetter(nextC))
+					tempString += c;
+					
+				else {
 					isWord = false;
 					isTokenDone = true;
+					strIndex--;
 				}
 			}
 			
-			else if (isNumber) {	//////////////////////////////////////////////////////////////////////
-				tempString += c;
+			else if (isNumber) {			// tokenizes numbers
 				char nextNextC = ' ';
 				if (strIndex + 2 < str.length())
 					nextNextC = str.charAt(strIndex + 2);
 					
-				if ((c == 'e' && nextC != '-' && !(Character.isDigit(nextNextC))) ||
-					!(Character.isDigit(nextC) && !findIfPunctuation(str, strIndex + 1))){
+				if (Character.isDigit(c) || Character.isDigit(nextC) ||
+					(c == 'e' && nextC == '-'))
+					tempString += c;
+					
+				else {
 					isNumber = false;
 					isTokenDone = true;
+					strIndex--;
 				}
 			}
 			
-			if(isTokenDone) {
+			else if (isPunctuation) {		// tokenizes punctuation
+				tempString += c;
+				isPunctuation = false;
+				isTokenDone = true;
+			}
+			
+			if(isTokenDone || strIndex == str.length() - 1) {
 				result[index] = tempString;
 				tempString = "";
 				index++;
@@ -105,30 +128,16 @@ public class HTMLUtilities {
 	/**
 	 *  Sees if the character passed in is one of the possible punctuation, and
 	 *  not part of a word or a number.
-	 * 	@param strIn			the string with the character to check
-	 *  @param indexIn			the index of the character to check in strIn
+	 * 	@param charIn			the character to check
 	 * 	@return isPunctuation	true if char is punctuation, otherwise false
 	 */
-	public boolean findIfPunctuation(String strIn, int indexIn) {
+	public boolean findIfPunctuation(char charIn) {
 		boolean isPunctuation = false;
 		char[] punctuation = {'.', ',', ';', ':', '(', ')', '?', '!', 
 				'=', '&', '~', '+', '-'};
-		char charIn = strIn.charAt(indexIn);
-		char prevChar = ' ';
-		char nextChar = ' ';
-		if (indexIn - 1 >= 0)
-			prevChar = strIn.charAt(indexIn - 1);
-		if (indexIn + 1 < strIn.length())
-			nextChar = strIn.charAt(indexIn + 1);
-			
 		for (int i = 0; i < punctuation.length; i++) {	
-			if (strIn.charAt(indexIn) == punctuation[i]) {
-				if (!(charIn == '-' && ((Character.isLetter(prevChar) && 
-					Character.isLetter(nextChar)) || Character.isDigit(nextChar))))
-					isPunctuation = true;
-				else if (!(charIn == '.' && Character.isDigit(prevChar) &&
-											Character.isDigit(nextChar)))
-					isPunctuation = true;
+			if (charIn == punctuation[i]) {
+				isPunctuation = true;
 			}
 		}
 		return isPunctuation;
@@ -148,6 +157,4 @@ public class HTMLUtilities {
 		}
 		System.out.println();
 	}
-}
-
 }
