@@ -43,7 +43,7 @@ public class HTMLUtilities {
 					isWord = true;
 				
 				else if (Character.isDigit(c) || c == '-' && 
-					Character.isDigit(nextC))
+					(Character.isDigit(nextC) || nextC == '.'))
 					isNumber = true;
 					
 				else if (findIfPunctuation(c) && !isWord && !isNumber)
@@ -85,8 +85,10 @@ public class HTMLUtilities {
 					nextNextC = str.charAt(strIndex + 2);
 					
 				if (Character.isDigit(c) || Character.isDigit(nextC) ||
-					(c == 'e' && nextC == '-'))
+					(c == 'e' && nextC == '-') || (c == '-' && nextC == '.'))
 					tempString += c;
+					
+				
 					
 				else {
 					isNumber = false;
