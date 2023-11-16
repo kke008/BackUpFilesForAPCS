@@ -76,6 +76,17 @@ public class HTMLUtilities {
 					}
 				}
 			}
+			
+			// tokenizes preformatted tags
+			else if (state == TokenState.PREFORMAT) {
+				tempString = str;
+				if (tempString.length() - 6 > 0 && tempString.indexOf("</pre>") != -1) {
+					strIndex -= 6;	// "</pre>" is 6 chars long
+					tempString = tempString.substring(0, tempString.length() - 6);
+					state = TokenState.NONE;
+					isTokenDone = true;
+				}
+			}
 				
 			else if (isTag) {
 				if (tempString.equals("<!") && c == '-' && nextC == '-') {	// checks if comment
@@ -96,8 +107,8 @@ public class HTMLUtilities {
 					if (c == '>') {
 						isTag = false;
 						isTokenDone = true;
-						if (tempString.equals("<pre>"))
-							state = TokenState.PREFORMAT;//////////////////////////////////////////////////////////////
+						if (tempString.equals("<pre>"))	// detects if preformatted
+							state = TokenState.PREFORMAT;
 					}
 				}
 			}
