@@ -11,12 +11,16 @@ public class HTMLUtilities {
 	// the current tokenizer state
 	private TokenState state;
 	
-	public static void main (String[] args) {////////////////////////////////////////////////////////////////
+	/*public static void main (String[] args) {////////////////////////////////////////////////////////////////
 		HTMLUtilities h = new HTMLUtilities();
-		String s = "<!-- comment -->";
+		String s = "asdfghj<!-- comment -->";
 		String[] t = h.tokenizeHTMLString(s);
+		for (int i = 0; i < t.length; i++) {
+			System.out.println(t[i]);
+		}
 		h.printTokens(t);
 	}
+	*/
 
 	/**
 	 *	Break the HTML string into tokens. The array returned is
@@ -61,15 +65,14 @@ public class HTMLUtilities {
 					isPunctuation = true;
 			}
 			
-			if (state == TokenState.COMMENT) {	// RECOGNIZES COMMENT BUT TOKENIZES ANYWAY !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			if (state == TokenState.COMMENT) {	// detects comments
 				tempString += c;
 				int tsLength = tempString.length();
-				if (tsLength - 2 > 0) {
-					if (c == '>' && tempString.charAt(tsLength - 2) == '-' &&
-						tempString.charAt(tsLength - 1) == '-') {
+				if (tsLength - 3 > 0) {
+					if (c == '>' && tempString.charAt(tsLength - 3) == '-' &&
+						tempString.charAt(tsLength - 2) == '-') {
 						state = TokenState.NONE;
 						tempString = "";
-						System.out.println();
 					}
 				}
 			}
@@ -93,6 +96,8 @@ public class HTMLUtilities {
 					if (c == '>') {
 						isTag = false;
 						isTokenDone = true;
+						if (tempString.equals("<pre>"))
+							state = TokenState.PREFORMAT;//////////////////////////////////////////////////////////////
 					}
 				}
 			}
@@ -171,7 +176,8 @@ public class HTMLUtilities {
 			}
 			
 			
-			if(state != TokenState.COMMENT && (isTokenDone || strIndex == str.length() - 1)) {
+			if(state != TokenState.COMMENT && tempString.length() > 0 && 
+				(isTokenDone || strIndex == str.length() - 1)) {
 				result[index] = tempString;
 				tempString = "";
 				index++;
