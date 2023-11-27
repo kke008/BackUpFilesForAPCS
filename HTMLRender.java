@@ -5,6 +5,9 @@ import java.util.Scanner;
  *	This program renders HTML code into a JFrame window.
  *	It requires your HTMLUtilities class and
  *	the SimpleHtmlRenderer and HtmlPrinter classes.
+ * 
+ *  To compile: javac -cp ".;SimpleHtmlRenderer.jar" *.jar
+ *  To run: java -cp ".;SimpleHtmlRenderer.jar" HTMLRender example7.html
  *
  *	The tags supported:
  *		<html>, </html> - start/end of the HTML file
@@ -22,7 +25,7 @@ import java.util.Scanner;
  *
  *	@author Mr.Greenstein and Karen Ke
  *  @ since November 16, 2023
- *	@version
+ *	@version 1
  */
 public class HTMLRender {
 	
@@ -56,16 +59,15 @@ public class HTMLRender {
 	
 	public static void main(String[] args) {
 		HTMLRender hf = new HTMLRender();
-		hf.run();
-		
-		// from HTMLTester.java:
-		if (args.length > 0)
+		if (args.length >= 0)
 			hf.fileName = args[0];
 			
 		else {
-			System.out.println("Usage: java HTMLTester <htmlFileName>");
+			System.out.println("ERROR: no file name given");
 			System.exit(0);
 		}
+		
+		hf.run();
 	}
 	
 	public void run() {
@@ -91,23 +93,23 @@ public class HTMLRender {
 			String token = tokens[index];
 			
 			// if token is </X> then the existing state is done 
-			if (token.charAt(1) == '/') {
+			if (token.length() > 0 && token.charAt(1) == '/') {	////////////////////////// ERROR HERE!!!!!!
 				state = TokenState.NONE;
-				if (token.equals("</p>"))
-					browser.println("\n");
+				if (token.equalsIgnoreCase("</p>"))
+					browser.println();
 			}
 			
 			// if the token only prints 1 char, that char is printed directly
-			else if (token.equals("<q>"))
+			else if (token.equalsIgnoreCase("<q>"))
 				browser.print("\"");
 				
-			else if (token.equals("\n"))
+			else if (token.equalsIgnoreCase("\n"))
 				browser.println();
 				
-			else if (token.equals("<hr>"))
+			else if (token.equalsIgnoreCase("<hr>"))
 				browser.printHorizontalRule();
 				
-			else if (token.equals("<br>"))
+			else if (token.equalsIgnoreCase("<br>"))
 				browser.printBreak();
 			
 			// if token sets rule for next tokens, the max line length and state are set
@@ -116,11 +118,13 @@ public class HTMLRender {
 		
 			// if the token will make the line go over the limit, it is
 			// printed on a new line
-			if (token.length() + lineLength > maxLineLength)
-				browswer.println();
+			if (token.length() + lineLength > maxLineLength) {
+				browser.println();
+				lineLength = 0;
+			}
 				
 			// printing the tokens to the browser
-			else if (state == TokenState.TEXT)
+			if (state == TokenState.TEXT)
 				browser.print(token);
 				
 			else if (state == TokenState.BOLD)
@@ -149,109 +153,61 @@ public class HTMLRender {
 				
 			else if (state == TokenState.PRE)
 				browser.printPreformattedText(token);
+				
+			// deals with space after tokens excluding punctuation
+			if (index + 1 < tokens.length && (!tokens[index + 1].equals(".") ||
+				!tokens[index + 1].equals("?") || !tokens[index + 1].equals("!")))
+				browser.print(" ");
 			
 			index++;
 			lineLength += token.length();
 		}
-		
-		
-		
-		
-		/*// Sample renderings from HtmlPrinter class
-		
-		// Print plain text without line feed at end
-		browser.print("First line");
-		
-		// Print line feed
-		browser.println();
-		
-		// Print bold words and plain space without line feed at end
-		browser.printBold("bold words");
-		browser.print(" ");
-		
-		// Print italic words without line feed at end
-		browser.printItalic("italic words");
-		
-		// Print horizontal rule across window (includes line feed before and after)
-		browser.printHorizontalRule();
-		
-		// Print words, then line feed (printBreak)
-		browser.print("A couple of words");
-		browser.printBreak();
-		browser.printBreak();
-		
-		// Print a double quote
-		browser.print("\"");
-		
-		// Print Headings 1 through 6 (Largest to smallest)
-		browser.printHeading1("Heading1");
-		browser.printHeading2("Heading2");
-		browser.printHeading3("Heading3");
-		browser.printHeading4("Heading4");
-		browser.printHeading5("Heading5");
-		browser.printHeading6("Heading6");
-		
-		// Print pre-formatted text (optional)
-		browser.printPreformattedText("Preformat Monospace\tfont");
-		browser.printBreak();
-		browser.print("The end");
-		*/
-		
 	}
 	
 	public int getMLLAndState(String tokenIn) {
 		int mll = 0;	// maxLineLength
 		
+		//changing state and mll based on whether or not certain tags are read
 		if (tokenIn.equals("<p>") || tokenIn.charAt(0) != '<') {
 			state = TokenState.TEXT;
 			mll = 80;
 		}
-		
 		else if (tokenIn.equals("<b>")) {
 			state = TokenState.BOLD;
 			mll = 80;
-		}
-		
+		}		
 		else if (tokenIn.equals("<i>")) {
 			state = TokenState.ITALIC;
 			mll = 80;
-		}
-		
+		}		
 		else if (tokenIn.equals("<h1>")) {
 			state = TokenState.H1;
 			mll = 40;
-		}
-		
+		}		
 		else if (tokenIn.equals("<h2>")) {
 			state = TokenState.H2;
 			mll = 50;
-		}
-			
+		}			
 		else if (tokenIn.equals("<h3>")) {
 			state = TokenState.H3;
 			mll = 60;
-		}
-			
+		}			
 		else if (tokenIn.equals("<h4>")) {
 			state = TokenState.H4;
 			mll = 80;
-		}
-			
+		}			
 		else if (tokenIn.equals("<h5>")) {
 			state = TokenState.H5;
 			mll = 100;
-		}
-			
+		}			
 		else if (tokenIn.equals("<h6>")) {
 			state = TokenState.H6;
 			mll = 120;
-		}
-		
+		}		
 		else if (tokenIn.equals("<pre>")) {
 			state = TokenState.PRE;
 			mll = tokenIn.length() + 1;
-		}
-		
+		}		
 		return mll;
 	}
 }
