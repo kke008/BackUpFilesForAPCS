@@ -153,27 +153,36 @@ public class HTMLRender {
 				
 				else if (state == TokenState.ITALIC)
 					browser.printItalic(token);
-				
-				else if (state == TokenState.H1)
-					browser.printHeading1(token);
-				
-				else if (state == TokenState.H2)
-					browser.printHeading2(token);
-				
-				else if (state == TokenState.H3)
-					browser.printHeading3(token);
-				
-				else if (state == TokenState.H4)
-					browser.printHeading4(token);
-				
-				else if (state == TokenState.H5)
-					browser.printHeading5(token);
-				
-				else if (state == TokenState.H6)
-					browser.printHeading6(token);
 					
 				else if (state == TokenState.PRE)
 					browser.printPreformattedText(token);
+					
+				// headings handled separately
+				else {
+					if (index + 1 < tokens.length && 
+						tokens[index + 1].length() > 2 &&
+						tokens[index + 1].length().charAt(1) == "/") {
+							
+					}/////////////////////////////////////////////////////////////////////////////////////////
+						
+					if (state == TokenState.H1)
+						browser.printHeading1(token);
+					
+					else if (state == TokenState.H2)
+						browser.printHeading2(token);
+					
+					else if (state == TokenState.H3)
+						browser.printHeading3(token);
+					
+					else if (state == TokenState.H4)
+						browser.printHeading4(token);
+					
+					else if (state == TokenState.H5)
+						browser.printHeading5(token);
+					
+					else if (state == TokenState.H6)
+						browser.printHeading6(token);
+				}
 			}
 			index++;
 		}
