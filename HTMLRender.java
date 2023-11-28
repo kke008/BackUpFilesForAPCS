@@ -1,5 +1,4 @@
 import java.util.Scanner;
-
 /**
  *	HTMLRender
  *	This program renders HTML code into a JFrame window.
@@ -40,8 +39,8 @@ public class HTMLRender {
 	private String fileName;	// name of html file
 	
 	// different states of tokens
-	private enum TokenState { BOLD, ITALIC, TEXT, OTHERTEXT, H1, H2, H3,
-		H4, H5, H6, HRULE, BREAK, PRE, NONE };
+	private enum TokenState { BOLD, ITALIC, TEXT, H1, H2, H3,
+		H4, H5, H6, HRULE, BREAK, PRE };
 	// the current state of the token to be printed
 	private TokenState state;
 		
@@ -49,7 +48,7 @@ public class HTMLRender {
 		// Initialize token array
 		tokens = new String[TOKENS_SIZE];
 		
-		state = TokenState.NONE;
+		state = TokenState.TEXT;	// default state is normal text
 		
 		// Initialize Simple Browser
 		render = new SimpleHtmlRenderer();
@@ -89,32 +88,42 @@ public class HTMLRender {
 		}
 		input.close();
 		
-		while (index < tokens.length && tokens[index].length() != 0) {
+		while (index < tokens.length && tokens[index] != null) {
 			String token = tokens[index];
 			
 			// if token is </X> then the existing state is done 
-			if (token.length() > 0 && token.charAt(1) == '/') {	////////////////////////// ERROR HERE!!!!!!
-				state = TokenState.NONE;
-				if (token.equalsIgnoreCase("</p>"))
-					browser.println();
+			if (token.length() > 1 && token.charAt(1) == '/')
+				maxLineLength = changeMLLAndState("end");
+			
+			// if the token only prints 1 constant char, that char is printed directly
+			if ((token.equalsIgnoreCase("<p>") && index - 1 >= 0 && 
+				!tokens[index - 1].equalsIgnoreCase("</p>")) || token.equalsIgnoreCase("</p>")) {
+				browser.println();
+				browser.println();
+				lineLength = 0;
 			}
 			
-			// if the token only prints 1 char, that char is printed directly
-			else if (token.equalsIgnoreCase("<q>"))
+			else if (token.equalsIgnoreCase("<q>") || token.equalsIgnoreCase("</q>"))
 				browser.print("\"");
 				
-			else if (token.equalsIgnoreCase("\n"))
+			else if (token.equalsIgnoreCase("\n")) {
 				browser.println();
+				lineLength = 0;
+			}
 				
-			else if (token.equalsIgnoreCase("<hr>"))
+			else if (token.equalsIgnoreCase("<hr>")) {
 				browser.printHorizontalRule();
+				lineLength = 0;
+			}
 				
-			else if (token.equalsIgnoreCase("<br>"))
+			else if (token.equalsIgnoreCase("<br>")) {
 				browser.printBreak();
+				lineLength = 0;
+			}
 			
 			// if token sets rule for next tokens, the max line length and state are set
-			else
-				maxLineLength = getMLLAndState(token);
+			else if (token.charAt(0) == '<')
+				maxLineLength = changeMLLAndState(token);
 		
 			// if the token will make the line go over the limit, it is
 			// printed on a new line
@@ -123,88 +132,102 @@ public class HTMLRender {
 				lineLength = 0;
 			}
 				
-			// printing the tokens to the browser
-			if (state == TokenState.TEXT)
-				browser.print(token);
+			// only deals with printing if the token is not a tag
+			if (token.charAt(0) != '<') {
+								
+				// deals with space between tokens but accounts for punctuation
+				if (index > 0 && !(token.length() == 1 && !Character.isLetter(token.charAt(0)) &&
+					!Character.isDigit(token.charAt(0)))) {
+					browser.print(" ");
+					lineLength++;
+				}
+					
+				lineLength += token.length();
 				
-			else if (state == TokenState.BOLD)
-				browser.printBold(token);
-			
-			else if (state == TokenState.ITALIC)
-				browser.printItalic(token);
-			
-			else if (state == TokenState.H1)
-				browser.printHeading1(token);
-			
-			else if (state == TokenState.H2)
-				browser.printHeading2(token);
-			
-			else if (state == TokenState.H3)
-				browser.printHeading3(token);
-			
-			else if (state == TokenState.H4)
-				browser.printHeading4(token);
-			
-			else if (state == TokenState.H5)
-				browser.printHeading5(token);
-			
-			else if (state == TokenState.H6)
-				browser.printHeading6(token);
+				// printing the tokens to the browser
+				if (state == TokenState.TEXT)
+					browser.print(token);
+					
+				else if (state == TokenState.BOLD)
+					browser.printBold(token);
 				
-			else if (state == TokenState.PRE)
-				browser.printPreformattedText(token);
+				else if (state == TokenState.ITALIC)
+					browser.printItalic(token);
 				
-			// deals with space after tokens excluding punctuation
-			if (index + 1 < tokens.length && (!tokens[index + 1].equals(".") ||
-				!tokens[index + 1].equals("?") || !tokens[index + 1].equals("!")))
-				browser.print(" ");
-			
+				else if (state == TokenState.H1)
+					browser.printHeading1(token);
+				
+				else if (state == TokenState.H2)
+					browser.printHeading2(token);
+				
+				else if (state == TokenState.H3)
+					browser.printHeading3(token);
+				
+				else if (state == TokenState.H4)
+					browser.printHeading4(token);
+				
+				else if (state == TokenState.H5)
+					browser.printHeading5(token);
+				
+				else if (state == TokenState.H6)
+					browser.printHeading6(token);
+					
+				else if (state == TokenState.PRE)
+					browser.printPreformattedText(token);
+			}
 			index++;
-			lineLength += token.length();
 		}
 	}
 	
-	public int getMLLAndState(String tokenIn) {
-		int mll = 0;	// maxLineLength
+	/** If the token being worked on is a tag, the max line length and the token
+	 * state (field var; changed directly) may be changed accordingly.
+	 * @param tokenIn		the token (tag) being worked with
+	 * @return mll			the max line length determined by the tag
+	 */
+	public int changeMLLAndState(String tokenIn) {
+		int mll = 80;	// maxLineLength; default is 80 characters
 		
-		//changing state and mll based on whether or not certain tags are read
-		if (tokenIn.equals("<p>") || tokenIn.charAt(0) != '<') {
+		// if the String passed in represents a tag that ends a state, the state
+		// is set to default (NONE) and the max line length remains its default		
+		// otherwise: changing state and mll based on whether or not certain tags are read
+		if (tokenIn.equalsIgnoreCase("<p>") || tokenIn.charAt(0) != '<' || 
+			tokenIn.equals("end")) {
 			state = TokenState.TEXT;
 			mll = 80;
 		}
-		else if (tokenIn.equals("<b>")) {
+		else if (tokenIn.equalsIgnoreCase("<b>")) {
 			state = TokenState.BOLD;
 			mll = 80;
 		}		
-		else if (tokenIn.equals("<i>")) {
+		else if (tokenIn.equalsIgnoreCase("<i>")) {
 			state = TokenState.ITALIC;
 			mll = 80;
 		}		
-		else if (tokenIn.equals("<h1>")) {
+		else if (tokenIn.equalsIgnoreCase("<h1>")) {
 			state = TokenState.H1;
 			mll = 40;
 		}		
-		else if (tokenIn.equals("<h2>")) {
+		else if (tokenIn.equalsIgnoreCase("<h2>")) {
 			state = TokenState.H2;
 			mll = 50;
 		}			
-		else if (tokenIn.equals("<h3>")) {
+		else if (tokenIn.equalsIgnoreCase("<h3>")) {
 			state = TokenState.H3;
 			mll = 60;
 		}			
-		else if (tokenIn.equals("<h4>")) {
+		else if (tokenIn.equalsIgnoreCase("<h4>")) {
 			state = TokenState.H4;
 			mll = 80;
 		}			
-		else if (tokenIn.equals("<h5>")) {
+		else if (tokenIn.equalsIgnoreCase("<h5>")) {
 			state = TokenState.H5;
 			mll = 100;
 		}			
-		else if (tokenIn.equals("<h6>")) {
+		else if (tokenIn.equalsIgnoreCase("<h6>")) {
 			state = TokenState.H6;
 			mll = 120;
 		}		
-		else if (tokenIn.equals("<pre>")) {
+		else if (tokenIn.equalsIgnoreCase("<pre>")) {
 			state = TokenState.PRE;
 			mll = tokenIn.length() + 1;
 		}		
