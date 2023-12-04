@@ -50,7 +50,15 @@ public class SortMethods {
 	 *	Insertion Sort algorithm - in ascending order (you implement)
 	 *	@param arr		array of Integer objects to sort
 	 */
-	public void insertionSort(Integer [] arr) {}
+	public void insertionSort(Integer [] arr) {
+		Integer[] sorted = new Integer[arr.length];
+		sorted[0] = arr[0];
+		int lastFilledIndex = 0;
+		for (int i = 1; i < arr.length; i++) {
+			for (int a = i; i < lastFilledIndex;
+		}
+		//sorted.add(int a, Element e);
+	}
 	
 	/**
 	 *	Merge Sort algorithm - in ascending order (you implement)
@@ -94,7 +102,7 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-/*/		
+		
 		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
@@ -107,7 +115,7 @@ public class SortMethods {
 		printArray(arr);
 		System.out.println();
 		
-/*		
+*/		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nInsertion Sort");
@@ -118,7 +126,7 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-*/
+
 /*		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
