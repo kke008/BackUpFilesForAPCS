@@ -33,16 +33,15 @@ public class SortMethods {
 	 *	Selection Sort algorithm - in ascending order (you implement)
 	 *	@param arr		array of Integer objects to sort
 	 */
-	public void selectionSort(Integer [] arr) {	/////////////////////////////////////// DOESN"T WORK
-		for (int outer = arr.length - 1; outer > 0; outer--) {
-			int tempMaxIndex = 0;
-			for (int inner = 0; inner < outer; inner++) {
-				if (arr[inner].compareTo(arr[tempMaxIndex]) > 0)
-					System.out.println (inner + ": " + arr[inner] + "\t\t" + tempMaxIndex + "; " + arr[tempMaxIndex]);
-				
-				System.out.println (arr[tempMaxIndex] + "\n\n");
+	public void selectionSort(Integer [] arr) {
+		int lengthOfUnsorted;
+		for (lengthOfUnsorted = arr.length; lengthOfUnsorted > 1; lengthOfUnsorted--) {
+			int indexOfMax = 0;
+			for (int inner = 0; inner < lengthOfUnsorted; inner++) {
+				if (arr[inner].compareTo(arr[indexOfMax]) > 0)
+					indexOfMax = inner;
 			}
-			swap(arr, tempMaxIndex, outer);	
+			swap(arr, indexOfMax, lengthOfUnsorted - 1);
 		}
 	}
 	
@@ -53,9 +52,19 @@ public class SortMethods {
 	public void insertionSort(Integer [] arr) {
 		Integer[] sorted = new Integer[arr.length];
 		sorted[0] = arr[0];
-		int lastFilledIndex = 0;
+		int numSorted = 1;
 		for (int i = 1; i < arr.length; i++) {
-			for (int a = i; i < lastFilledIndex;
+			int newIndex = 0;
+			for (int a = 0; a < numSorted; a++) {
+				if (arr[i].compareTo(arr[a]) > 0)
+					newIndex++;
+			}
+			for (int b = numSorted - 1; b >= newIndex; b--) {
+				if (arr[b] != null)
+					arr[b + 1] = arr[b];
+			}
+			arr[newIndex] = arr[i];
+			numSorted++;
 		}
 		//sorted.add(int a, Element e);
 	}
@@ -102,9 +111,10 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
+		*/
 		
 		
-		for (int a = 0; a < 10; a++)
+	/*	for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nSelection Sort");
 		System.out.println("Array before sort:");
@@ -114,8 +124,8 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
+	*/	
 		
-*/		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nInsertion Sort");
@@ -127,7 +137,7 @@ public class SortMethods {
 		printArray(arr);
 		System.out.println();
 
-/*		
+	/*	
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nMerge Sort");
