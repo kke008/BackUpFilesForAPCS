@@ -10,14 +10,14 @@ public class City implements Comparable<City> {
 	// fields
 	private String name;
 	private String state;
-	private String type;
+	private String designation;
 	private int population;
 	
 	// constructor
 	public City(String nameIn, String stateIn, String typeIn, int popIn) {
 		name = nameIn;
 		state = stateIn;
-		type = typeIn;
+		designation = typeIn;
 		population = popIn;
 	}
 	
@@ -28,15 +28,15 @@ public class City implements Comparable<City> {
 	 *		else if states are different, then returns (this.state - other.state)
 	 *		else returns (this.name - other.name)
 	 */
-	 public int compare(City other) {
+	 public int compareTo(City other) {
 		 if (this.population != other.population)
 			return (this.population - other.population);
 			
 		else if (this.state.equals(other.state) == false)
-			return (this.state - other.state);
+			return (this.state.compareTo(other.state));
 			
 		else
-			return (this.name - other.name);
+			return (this.name.compareTo(other.name));
 	 }
 	
 	/**	Equal city name and state name
@@ -44,18 +44,9 @@ public class City implements Comparable<City> {
 	 *	@return				true if city name and state name equal; false otherwise
 	 */
 	 public boolean equals(City other) {
-		 boolean isEqual = true;
-		 for (int i = 0; i < getName().length(); i++) {
-			 if (getName().charAt(i) != other.getName().charAt(i))
-				isEqual = false;
-		 }
-		 
-		 for (int j = 0; j < getState().length(); j++) {
-			 if (getState.charAt(j) != other.getState().charAt(i))
-				isEqual = false;
-		 }
-		 
-		 return isEqual;
+		if (this.name.equals(other.name) && this.state.equals(other.state))
+			return true;
+		return false;
 	 }
 	
 	/**	Accessor methods */
@@ -68,7 +59,7 @@ public class City implements Comparable<City> {
 	}
 	
 	public String getType() {
-		return type;
+		return designation;
 	}
 	
 	public int getPopulation() {
