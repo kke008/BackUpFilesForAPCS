@@ -89,6 +89,11 @@ public class SortMethods {
 			arr[k] = temp[k];
 	}
 	
+	/** Merges the two arrays (the halves in merge sort)
+	 *  @param half1	one of the two arrays to be merged
+	 *  @param half2	the other of the two arrays to be merge
+	 *  @return merged		the merged array
+	 */
 	public Integer[] merge(Integer[] half1, Integer[] half2) {
 		Integer[] merged = new Integer[half1.length + half2.length];
 		int ind1 = 0;
