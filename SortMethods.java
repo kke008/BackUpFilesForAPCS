@@ -50,30 +50,92 @@ public class SortMethods {
 	 *	@param arr		array of Integer objects to sort
 	 */
 	public void insertionSort(Integer [] arr) {
-		Integer[] sorted = new Integer[arr.length];
-		sorted[0] = arr[0];
-		int numSorted = 1;
 		for (int i = 1; i < arr.length; i++) {
-			int newIndex = 0;
-			for (int a = 0; a < numSorted; a++) {
-				if (arr[i].compareTo(arr[a]) > 0)
-					newIndex++;
+			Integer temp = arr[i];
+			int index = i;
+			while (index > 0 && temp < arr[index - 1]){
+				arr[index] = arr[index - 1];
+				index--;
 			}
-			for (int b = numSorted - 1; b >= newIndex; b--) {
-				if (arr[b] != null)
-					arr[b + 1] = arr[b];
-			}
-			arr[newIndex] = arr[i];
-			numSorted++;
-		}
-		//sorted.add(int a, Element e);
+			arr[index] = temp;
+		} 
 	}
 	
 	/**
 	 *	Merge Sort algorithm - in ascending order (you implement)
 	 *	@param arr		array of Integer objects to sort
 	 */
-	public void mergeSort(Integer [] arr) {}
+	public void mergeSort(Integer [] arr) {
+		sortHalves(arr);
+	}
+	
+	public Integer[] sortHalves(Integer[] temp) {
+		if (temp.length == 2 && temp[1] < temp[0])
+			swap(temp, 0, 1);
+			
+		else if (temp.length > 2) {
+			Integer[] half1 = new Integer[temp.length / 2];
+			for (int i = 0; i < half1.length; i++)
+				half1[i] = temp[i];
+			
+			Integer[] half2 = new Integer[temp.length - temp.length / 2];
+			for (int j = 0; j < half2.length; j++)
+				half2[j] = temp[j + temp.length / 2];
+			
+			half1 = sortHalves(half1);
+			half2 = sortHalves(half2);
+			 
+			temp = merge(half1, half2);
+		 }
+		 System.out.print("temp: ");				////////////////////////////////////////
+		 for (int i = 0; i < temp.length; i++) {
+			 System.out.print(temp[i] + ", ");
+		 }
+		 System.out.println();
+		 
+		 return temp;
+	}
+	
+	public Integer[] merge(Integer[] half1, Integer[] half2) {
+		Integer[] merged = new Integer[half1.length + half2.length];
+		int ind1 = 0;
+		int ind2 = 0;
+		int index = 0;
+		while (index < merged.length && ind1 < half1.length && ind2 < half2.length) {
+			
+			if (half1[ind1] < half2[ind2]) {
+				merged[index] = half1[ind1];
+				ind1++;
+			}
+			else if (half1[ind1] > half2[ind2]) {
+				merged[index] = half2[ind2];
+				ind2++;
+			}
+			else {
+				merged[index] = half1[ind1];
+				index++;
+				merged[index] = half2[ind2];
+				ind1++;
+				ind2++;
+			}
+			index++;
+		}
+		
+		if (ind1 == half1.length) {
+			for (int a = ind2; a < half2.length; a++) {
+				merged[index] = half2[a];
+				index++;
+			}
+		}
+		else if (ind2 == half2.length) {
+			for (int b = ind1; b < half1.length; b++) {
+				merged[index] = half1[b];
+				index++;
+			}
+		}
+		
+		return merged;
+	}
 	
 	/*****************************************************************/
 	/************************* For Testing ***************************/
@@ -124,7 +186,7 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-	*/	
+		
 		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
@@ -136,8 +198,8 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-
-	/*	
+*/
+	
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nMerge Sort");
@@ -148,6 +210,6 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-*/
+
 	}
 }
