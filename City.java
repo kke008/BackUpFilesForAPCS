@@ -7,11 +7,10 @@
  */
 public class City implements Comparable<City> {
 	
-	// fields
-	private String name;
-	private String state;
-	private String designation;
-	private int population;
+	private String name;	// name of city
+	private String state;	// state that city is in
+	private String designation;		// type of city it is
+	private int population;		// population of city
 	
 	// constructor
 	public City(String nameIn, String stateIn, String typeIn, int popIn) {
@@ -28,15 +27,37 @@ public class City implements Comparable<City> {
 	 *		else if states are different, then returns (this.state - other.state)
 	 *		else returns (this.name - other.name)
 	 */
-	 public int compareTo(City other) {
+	 public int compare(City other) {
 		 if (this.population != other.population)
 			return (this.population - other.population);
 			
-		else if (this.state.equals(other.state) == false)
-			return (this.state.compareTo(other.state));
+		else if (this.state.equals(other.state) == false) {
+			int i = 0;
+			while (i < other.state.length() && i < state.length()) {
+				char letter = state.charAt(i);
+				char otherLetter = other.state.charAt(i);
+				if (letter != otherLetter)
+					return ((int)(letter) - (int)(otherLetter));
+			}
+			if (i == state.length())	// if name of other state is longer
+				return -1;
+			else
+				return 1;
+		}
 			
-		else
-			return (this.name.compareTo(other.name));
+		else {
+			int j = 0;
+			while (j < name.length() && j < other.name.length()) {
+				char letter = name.charAt(j);
+				char otherLetter = other.name.charAt(j);
+				if (letter != otherLetter)
+					return ((int)(letter) - (int)(otherLetter));
+			}
+			if (j == name.length())	// if name of other name is longer
+				return -1;
+			else
+				return 1;
+		}
 	 }
 	
 	/**	Equal city name and state name
@@ -44,9 +65,18 @@ public class City implements Comparable<City> {
 	 *	@return				true if city name and state name equal; false otherwise
 	 */
 	 public boolean equals(City other) {
-		if (this.name.equals(other.name) && this.state.equals(other.state))
-			return true;
-		return false;
+		 boolean isEqual = true;
+		 for (int i = 0; i < getName().length(); i++) {
+			 if (getName().charAt(i) != other.getName().charAt(i))
+				isEqual = false;
+		 }
+		 
+		 for (int j = 0; j < getState().length(); j++) {
+			 if (getState().charAt(j) != other.getState().charAt(j))
+				isEqual = false;
+		 }
+		 
+		 return isEqual;
 	 }
 	
 	/**	Accessor methods */
