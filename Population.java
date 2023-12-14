@@ -26,14 +26,33 @@ public class Population {
 		pop.run();
 	}
 	
+	/** Reads the usPopData2017.txt file and uses it to fill in List<City> cities.
+	 *  Also uses deliminiter "[\t\n]"
+	 */
+	public void fillCities() {
+		Scanner reader = FileUtils.openToRead(DATA_FILE);
+		int a = 0;
+		while(reader.hasNext()) {
+			Scanner d = new Scanner(reader.nextLine());
+			d.useDelimiter("[\t\n]");
+			String state = d.next();
+			String city = d.next();
+			String type = d.next();
+			int population = Integer.parseInt(d.next());
+			cities.add(new City(city, state, type, population));
+			d.close();
+		}
+		reader.close();
+	}	
+	
 	/** prints introduction then asks user to choose an option from the 
 	 *  menu. Calls appropriate methods for appropriate response.
 	 */
 	public void run() {
 		fillCities();
-		printIntroduction();
-		System.out.printf("%d cities in database\n", cities.size());
-		printMenu();
+		//printIntroduction();
+		//System.out.printf("%d cities in database\n", cities.size());
+		//printMenu();
 		int choice = 0;
 		while (choice != 9) {
 			choice = Prompt.getInt("\nEnter selection ");
@@ -42,7 +61,7 @@ public class Population {
 				///long startMillisec = System.currentTimeMillis();	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				if (choice == 1)	// print 50 least populous cities
 					printByPopulation(true);
-				else if (choice == 2)	// print 50 most popular cities
+				/*else if (choice == 2)
 					printByPopulation(false);
 					
 				else if (choice == 3)
@@ -76,11 +95,11 @@ public class Population {
 	 */
 	public void printByPopulation(boolean least) {
 		if (least) {
-			ascendingPopulation();
+			ascendingPopulation(cities);
 			System.out.println("Fifty least populous cities");
 		}
 		else {
-			descendingPopulation();
+			descendingPopulation(cities);
 			System.out.println("Fifty most populous cities");
 		}
 		
@@ -100,12 +119,12 @@ public class Population {
 	 */
 	public void printByName(boolean first) {
 		if (first) {
-			ascendingName();
+			ascendingName(cities);
 			System.out.println("Fifty cities sorted by name\n");
 		}
 		
 		else {
-			descendingName();
+			descendingName(cities);
 			System.out.println("Fifty cities sorted by name descending\n");
 		}
 		
@@ -142,25 +161,6 @@ public class Population {
 		System.out.println("9. Quit");
 	}
 	
-	/** Reads the usPopData2017.txt file and uses it to fill in List<City> cities.
-	 *  Also uses deliminiter "[\t\n]"
-	 */
-	public void fillCities() {
-		Scanner reader = FileUtils.openToRead(DATA_FILE);
-		int a = 0;
-		while(reader.hasNext()) {
-			Scanner d = new Scanner(reader.nextLine());
-			d.useDelimiter("[\t\n]");
-			String state = d.next();
-			String city = d.next();
-			String type = d.next();
-			int population = Integer.parseInt(d.next());
-			cities.add(new City(city, state, type, population));
-			d.close();
-		}
-		reader.close();
-	}	
-	
 	/**
 	 *	Swaps two Integer objects in array arr
 	 *	@param list		list of City objects
@@ -180,10 +180,9 @@ public class Population {
 	 *  @param list		list of cities to sort
 	 */
 	public void ascendingPopulation (List<City> list) {
-		int lengthOfUnsorted;
-		for (lengthOfUnsorted = list.size(); lengthOfUnsorted > 1; lengthOfUnsorted--) {
+		for (int lengthOfUnsorted = list.size(); lengthOfUnsorted > 1; lengthOfUnsorted--) {
 			int indexOfMax = 0;
-			for (int inner = 0; inner < lengthOfUnsorted; inner++) {
+			for (int inner = 1; inner < lengthOfUnsorted; inner++) {
 				if (list.get(inner).compareTo(list.get(indexOfMax)) > 0)
 					indexOfMax = inner;
 			}
@@ -196,27 +195,30 @@ public class Population {
 	 * 	@param list		list of cities to sort
 	 */
 	public void descendingPopulation(List<City> list) {	//////////////////////////////////////////////////////////////////////////
-		Integer[] temp = arr;
-		if (temp.length == 2 && temp[1] > temp[0])
+		List<City> temp = list;
+		if (temp.size() == 2 && temp.get(1).compareTo(temp.get(0)) > 0)
 			swap(temp, 0, 1);
 			
-		else if (temp.length > 2) {
-			Integer[] half1 = new Integer[temp.length / 2];
-			for (int i = 0; i < half1.length; i++)
-				half1[i] = temp[i];
+		else if (temp.size() > 2) {
+			int mid = (temp.size() - 1)/2;
+			List<City> half1 = new ArrayList<City>();
+			for (int i = 0; i <= mid; i++)
+				half1.add(temp.get(i));
 			
-			Integer[] half2 = new Integer[temp.length - temp.length / 2];
-			for (int j = 0; j < half2.length; j++)
-				half2[j] = temp[j + temp.length / 2];
+			List<City> half2 = new ArrayList<City>();
+			for (int j = mid + 1; j < temp.size(); j++)
+				half2.add(temp.get(j));
 			
-			mergeSort(half1);
-			mergeSort(half2);
+			descendingPopulation(half1);
+			descendingPopulation(half2);
 			 
+			System.out.println(half1.size() + " " + half2.size());
 			temp = merge(half1, half2);
 		 }
 		 
-		 for (int k = 0; k < arr.length; k++)
-			arr[k] = temp[k];
+		 for (int k = 0; k < list.size(); k++)
+			list.set(k, temp.get(k));
+			
 	}
 	
 	/** Merges the two arrays (the halves in merge sort)
@@ -224,39 +226,39 @@ public class Population {
 	 *  @param half2	the other of the two arrays to be merge
 	 *  @return merged		the merged array
 	 */
-	public Integer[] merge(Integer[] half1, Integer[] half2) {
-		Integer[] merged = new Integer[half1.length + half2.length];
+	public List<City> merge(List<City> half1, List<City> half2) {
+		List<City> merged = new ArrayList<City>();
 		int ind1 = 0;
 		int ind2 = 0;
 		int index = 0;
-		while (index < merged.length && ind1 < half1.length && ind2 < half2.length) {
-			if (half1[ind1] > half2[ind2]) {
-				merged[index] = half1[ind1];
+		while (index < half1.size() + half2.size() && ind1 < half1.size() && ind2 < half2.size()) {
+			if (half1.get(ind1).compareTo(half2.get(ind2)) > 0) {
+				merged.set(index, half1.get(ind1));
 				ind1++;
 			}
-			else if (half1[ind1] < half2[ind2]) {
-				merged[index] = half2[ind2];
+			else if (half1.get(ind1).compareTo(half2.get(ind2)) < 0) {
+				merged.set(index, half2.get(ind2));
 				ind2++;
 			}
 			else {
-				merged[index] = half1[ind1];
+				merged.set(index, half1.get(ind1));
 				index++;
-				merged[index] = half2[ind2];
+				merged.set(index, half2.get(ind2));
 				ind1++;
 				ind2++;
 			}
 			index++;
 		}
 		
-		if (ind1 == half1.length) {
-			for (int a = half2.length - 1; a >= ind2; a--) {
-				merged[index] = half2[a];
+		if (ind1 == half1.size()) {
+			for (int a = half2.size() - 1; a >= ind2; a--) {
+				merged.set(index, half2.get(a));
 				index++;
 			}
 		}
-		else if (ind2 == half2.length) {
-			for (int b = half1.length - 1; b >= ind1; b--) {
-				merged[index] = half1[b];
+		else if (ind2 == half2.size()) {
+			for (int b = half1.size() - 1; b >= ind1; b--) {
+				merged.set(index, half1.get(b));
 				index++;
 			}
 		}
@@ -271,7 +273,7 @@ public class Population {
 		for (int i = 1; i < list.size(); i++) {
 			City temp = list.get(i);
 			int index = i;
-			while (index > 0 && temp < list.get(index - 1)){
+			while (index > 0 && temp.compareTo(list.get(index - 1)) < 0){
 				list.set(index, list.get(index - 1));
 				index--;
 			}
@@ -283,34 +285,34 @@ public class Population {
 	 *  @param list		list of cities to sort
 	 */
 	public void descendingName(List<City> list) {	//////////////////////////////////////////////////////////////////////////
-		Integer[] temp = arr;
-		if (temp.length == 2 && temp[1] > temp[0])
+		List<City> temp = list;
+		if (temp.size() == 2 && temp.get(1).compareTo(temp.get(0)) > 0)
 			swap(temp, 0, 1);
 			
-		else if (temp.length > 2) {
-			Integer[] half1 = new Integer[temp.length / 2];
-			for (int i = 0; i < half1.length; i++)
-				half1[i] = temp[i];
+		else if (temp.size() > 2) {
+			List<City> half1 = new ArrayList<City>();
+			for (int i = 0; i < temp.size()/2; i++)
+				half1.set(i, temp.get(i));
 			
-			Integer[] half2 = new Integer[temp.length - temp.length / 2];
-			for (int j = 0; j < half2.length; j++)
-				half2[j] = temp[j + temp.length / 2];
+			List<City> half2 = new ArrayList<City>();
+			for (int j = 0; j < temp.size() - temp.size()/2; j++)
+				half2.set(j, temp.get(j + temp.size()/2));
 			
-			mergeSort(half1);
-			mergeSort(half2);
+			descendingName(half1);
+			descendingName(half2);
 			 
 			temp = merge(half1, half2);
 		 }
 		 
-		 for (int k = 0; k < arr.length; k++)
-			arr[k] = temp[k];
+		 for (int k = 0; k < list.size(); k++)
+			list.set(k, temp.get(k));
 	}
 	
 	/** Prints most populous city in given state.
 	 *  @param stateName	name of state to search in
 	 */
 	public void mostPopulousCities(String stateName) {
-		List<City> inState = new List<City>();
+		List<City> inState = new ArrayList<City>();
 		for (int i = 0; i < cities.size(); i++) {	// making list of cities in state
 			if (cities.get(i).getState().equals(stateName))
 				inState.add(cities.get(i));
@@ -325,13 +327,14 @@ public class Population {
 			City city = cities.get(j);
 			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
 				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
+		}
 	}
 	
 	/** Prints all the cities of a given name, sorted by population.
 	 *  @param cityName		name of city to search for
 	 */
 	public void listCities(String cityName) {
-		List<City> ofName = new List<City>();
+		List<City> ofName = new ArrayList<City>();
 		do{
 			for (int i = 0; i < cities.size(); i++)	{	// making list of cities with same name
 				if (cities.get(i).getName().equals(cityName))
@@ -339,15 +342,15 @@ public class Population {
 			}
 		} while (ofName.size() == 0);
 		
-		descendingPopulation(inState);
+		descendingPopulation(ofName);
 		System.out.printf("City %s by population\n", cityName);
 		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
 			"Type", "Population");
 			
-		for (int j = 0; j < inState.size(); j++) {
+		for (int j = 0; j < ofName.size(); j++) {
 			City city = cities.get(j);
 			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
 				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
+		}
 	}
-	
 }
