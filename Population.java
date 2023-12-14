@@ -39,10 +39,10 @@ public class Population {
 			choice = Prompt.getInt("\nEnter selection ");
 			
 			if (choice != 9) {
-				long startMillisec = System.currentTimeMillis();
+				///long startMillisec = System.currentTimeMillis();	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				if (choice == 1)	// print 50 least populous cities
 					printByPopulation(true);
-				else if (choice == 2)
+				else if (choice == 2)	// print 50 most popular cities
 					printByPopulation(false);
 					
 				else if (choice == 3)
@@ -61,9 +61,11 @@ public class Population {
 					listCities(givenCity);
 				}
 				
+				/*
 				long endMillisec = System.currentTimeMillis();
 				System.out.printf("\nElapsed time: %d milliseconds\n\n", 
 					endMillisec - startMillisec + 1);
+					*///										!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 		}
 	}
@@ -154,69 +156,198 @@ public class Population {
 			String type = d.next();
 			int population = Integer.parseInt(d.next());
 			cities.add(new City(city, state, type, population));
+			d.close();
 		}
+		reader.close();
 	}	
 	
 	/**
 	 *	Swaps two Integer objects in array arr
-	 *	@param arr		array of Integer objects
+	 *	@param list		list of City objects
 	 *	@param x		index of first object to swap
 	 *	@param y		index of second object to swap
 	 */
-	private void swap(int x, int y) {
-		City atX = cities.get(x);
-		City atY = cities.get(y);
-		cities.remove(x);
-		cities.add(x, atY);
-		cities.remove(y);
-		cities.add(y, atX);
+	private void swap(List<City> list, int x, int y) {
+		City atX = list.get(x);
+		City atY = list.get(y);
+		list.remove(x);
+		list.add(x, atY);
+		list.remove(y);
+		list.add(y, atX);
 	}
 	
 	/** Sorts cities in ascending order by population using selection sort.
+	 *  @param list		list of cities to sort
 	 */
-	public void ascendingPopulation () {
+	public void ascendingPopulation (List<City> list) {
 		int lengthOfUnsorted;
-		for (lengthOfUnsorted = cities.size(); lengthOfUnsorted > 1; lengthOfUnsorted--) {
+		for (lengthOfUnsorted = list.size(); lengthOfUnsorted > 1; lengthOfUnsorted--) {
 			int indexOfMax = 0;
 			for (int inner = 0; inner < lengthOfUnsorted; inner++) {
-				if (cities.get(inner).compareTo(cities.get(indexOfMax)) > 0)
+				if (list.get(inner).compareTo(list.get(indexOfMax)) > 0)
 					indexOfMax = inner;
 			}
-			swap(indexOfMax, lengthOfUnsorted - 1);
+			swap(list, indexOfMax, lengthOfUnsorted - 1);
 		}
 	}
 	
 	
 	/** Sorts cities in descending order by population using merge sort.
+	 * 	@param list		list of cities to sort
 	 */
-	public void descendingPopulation() {
+	public void descendingPopulation(List<City> list) {	//////////////////////////////////////////////////////////////////////////
+		Integer[] temp = arr;
+		if (temp.length == 2 && temp[1] > temp[0])
+			swap(temp, 0, 1);
+			
+		else if (temp.length > 2) {
+			Integer[] half1 = new Integer[temp.length / 2];
+			for (int i = 0; i < half1.length; i++)
+				half1[i] = temp[i];
+			
+			Integer[] half2 = new Integer[temp.length - temp.length / 2];
+			for (int j = 0; j < half2.length; j++)
+				half2[j] = temp[j + temp.length / 2];
+			
+			mergeSort(half1);
+			mergeSort(half2);
+			 
+			temp = merge(half1, half2);
+		 }
+		 
+		 for (int k = 0; k < arr.length; k++)
+			arr[k] = temp[k];
+	}
+	
+	/** Merges the two arrays (the halves in merge sort)
+	 *  @param half1	one of the two arrays to be merged
+	 *  @param half2	the other of the two arrays to be merge
+	 *  @return merged		the merged array
+	 */
+	public Integer[] merge(Integer[] half1, Integer[] half2) {
+		Integer[] merged = new Integer[half1.length + half2.length];
+		int ind1 = 0;
+		int ind2 = 0;
+		int index = 0;
+		while (index < merged.length && ind1 < half1.length && ind2 < half2.length) {
+			if (half1[ind1] > half2[ind2]) {
+				merged[index] = half1[ind1];
+				ind1++;
+			}
+			else if (half1[ind1] < half2[ind2]) {
+				merged[index] = half2[ind2];
+				ind2++;
+			}
+			else {
+				merged[index] = half1[ind1];
+				index++;
+				merged[index] = half2[ind2];
+				ind1++;
+				ind2++;
+			}
+			index++;
+		}
 		
+		if (ind1 == half1.length) {
+			for (int a = half2.length - 1; a >= ind2; a--) {
+				merged[index] = half2[a];
+				index++;
+			}
+		}
+		else if (ind2 == half2.length) {
+			for (int b = half1.length - 1; b >= ind1; b--) {
+				merged[index] = half1[b];
+				index++;
+			}
+		}
+		
+		return merged;
 	}
 	
 	/** Sorts cities in ascending order by name using insertion sort.
+	 *  @param list		list of cities to sort
 	 */
-	public void ascendingName() {
-		
+	public void ascendingName(List<City> list) {
+		for (int i = 1; i < list.size(); i++) {
+			City temp = list.get(i);
+			int index = i;
+			while (index > 0 && temp < list.get(index - 1)){
+				list.set(index, list.get(index - 1));
+				index--;
+			}
+			list.set(index, temp);
+		} 
 	}
 	
 	/** Sorts cities in descending order by name using merge sort.
+	 *  @param list		list of cities to sort
 	 */
-	public void descendingName() {
-		
+	public void descendingName(List<City> list) {	//////////////////////////////////////////////////////////////////////////
+		Integer[] temp = arr;
+		if (temp.length == 2 && temp[1] > temp[0])
+			swap(temp, 0, 1);
+			
+		else if (temp.length > 2) {
+			Integer[] half1 = new Integer[temp.length / 2];
+			for (int i = 0; i < half1.length; i++)
+				half1[i] = temp[i];
+			
+			Integer[] half2 = new Integer[temp.length - temp.length / 2];
+			for (int j = 0; j < half2.length; j++)
+				half2[j] = temp[j + temp.length / 2];
+			
+			mergeSort(half1);
+			mergeSort(half2);
+			 
+			temp = merge(half1, half2);
+		 }
+		 
+		 for (int k = 0; k < arr.length; k++)
+			arr[k] = temp[k];
 	}
 	
 	/** Prints most populous city in given state.
 	 *  @param stateName	name of state to search in
 	 */
 	public void mostPopulousCities(String stateName) {
+		List<City> inState = new List<City>();
+		for (int i = 0; i < cities.size(); i++) {	// making list of cities in state
+			if (cities.get(i).getState().equals(stateName))
+				inState.add(cities.get(i));
+		}
 		
+		descendingPopulation(inState);
+		System.out.printf("Fifty most populous cities in %s\n", stateName);
+		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+			"Type", "Population");
+			
+		for (int j = 0; j < 50; j++) {
+			City city = cities.get(j);
+			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
+				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
 	}
 	
 	/** Prints all the cities of a given name, sorted by population.
 	 *  @param cityName		name of city to search for
 	 */
 	public void listCities(String cityName) {
+		List<City> ofName = new List<City>();
+		do{
+			for (int i = 0; i < cities.size(); i++)	{	// making list of cities with same name
+				if (cities.get(i).getName().equals(cityName))
+					ofName.add(cities.get(i));
+			}
+		} while (ofName.size() == 0);
 		
+		descendingPopulation(inState);
+		System.out.printf("City %s by population\n", cityName);
+		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+			"Type", "Population");
+			
+		for (int j = 0; j < inState.size(); j++) {
+			City city = cities.get(j);
+			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
+				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
 	}
 	
 }
