@@ -65,11 +65,8 @@ public class SortMethods {
 	 *	Merge Sort algorithm - in ascending order (you implement)
 	 *	@param arr		array of Integer objects to sort
 	 */
-	public void mergeSort(Integer [] arr) {
-		sortHalves(arr);
-	}
-	
-	public Integer[] sortHalves(Integer[] temp) {
+	 public void mergeSort(Integer [] arr) {
+		Integer[] temp = arr;
 		if (temp.length == 2 && temp[1] < temp[0])
 			swap(temp, 0, 1);
 			
@@ -82,18 +79,14 @@ public class SortMethods {
 			for (int j = 0; j < half2.length; j++)
 				half2[j] = temp[j + temp.length / 2];
 			
-			half1 = sortHalves(half1);
-			half2 = sortHalves(half2);
+			mergeSort(half1);
+			mergeSort(half2);
 			 
 			temp = merge(half1, half2);
 		 }
-		 System.out.print("temp: ");				////////////////////////////////////////
-		 for (int i = 0; i < temp.length; i++) {
-			 System.out.print(temp[i] + ", ");
-		 }
-		 System.out.println();
 		 
-		 return temp;
+		 for (int k = 0; k < arr.length; k++)
+			arr[k] = temp[k];
 	}
 	
 	public Integer[] merge(Integer[] half1, Integer[] half2) {
@@ -136,7 +129,6 @@ public class SortMethods {
 		
 		return merged;
 	}
-	
 	/*****************************************************************/
 	/************************* For Testing ***************************/
 	/*****************************************************************/
@@ -163,7 +155,7 @@ public class SortMethods {
 	public void run() {
 		Integer[] arr = new Integer[10];
 		// Fill arr with random numbers
-/*		for (int a = 0; a < 10; a++)
+		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nBubble Sort");
 		System.out.println("Array before sort:");
@@ -173,10 +165,9 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-		*/
+
 		
-		
-	/*	for (int a = 0; a < 10; a++)
+		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nSelection Sort");
 		System.out.println("Array before sort:");
@@ -198,8 +189,8 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-*/
-	
+
+		
 		for (int a = 0; a < 10; a++)
 			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nMerge Sort");
@@ -210,6 +201,5 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
-
 	}
 }
