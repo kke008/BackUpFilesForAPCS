@@ -50,9 +50,10 @@ public class Population {
 	 */
 	public void run() {
 		fillCities();
-		//printIntroduction();
-		//System.out.printf("%d cities in database\n", cities.size());
-		//printMenu();
+		printByPopulation(true);
+		printIntroduction();
+		System.out.printf("%d cities in database\n", cities.size());
+		printMenu();
 		int choice = 0;
 		while (choice != 9) {
 			choice = Prompt.getInt("\nEnter selection ");
@@ -61,7 +62,7 @@ public class Population {
 				///long startMillisec = System.currentTimeMillis();	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				if (choice == 1)	// print 50 least populous cities
 					printByPopulation(true);
-				/*else if (choice == 2)
+				else if (choice == 2)
 					printByPopulation(false);
 					
 				else if (choice == 3)
@@ -131,12 +132,11 @@ public class Population {
 		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
 			"Type", "Population");
 			
-		for (int i = 0; i < 50; i++) {
+		for (int i = 0; i < 4; i++) {	// CHANGE BACK TO 50!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			City city = cities.get(i);
 			System.out.printf("%5s%-22s%-22s%-11s%11d\n", i + 1 + ":", 
 				city.getState(), city.getName(), city.getType(), city.getPopulation());
 		}	
-			
 	}
 	
 	/**	Prints the introduction to Population */
@@ -183,7 +183,7 @@ public class Population {
 		for (int lengthOfUnsorted = list.size(); lengthOfUnsorted > 1; lengthOfUnsorted--) {
 			int indexOfMax = 0;
 			for (int inner = 1; inner < lengthOfUnsorted; inner++) {
-				if (list.get(inner).compareTo(list.get(indexOfMax)) > 0)
+				if (list.get(inner).getPopulation() > list.get(indexOfMax).getPopulation())
 					indexOfMax = inner;
 			}
 			swap(list, indexOfMax, lengthOfUnsorted - 1);
@@ -196,11 +196,11 @@ public class Population {
 	 */
 	public void descendingPopulation(List<City> list) {	//////////////////////////////////////////////////////////////////////////
 		List<City> temp = list;
-		if (temp.size() == 2 && temp.get(1).compareTo(temp.get(0)) > 0)
+		if (temp.size() == 2 && temp.get(1).getPopulation() > temp.get(0).getPopulation())
 			swap(temp, 0, 1);
 			
 		else if (temp.size() > 2) {
-			int mid = (temp.size() - 1)/2;
+			int mid = (temp.size() - 1) / 2;
 			List<City> half1 = new ArrayList<City>();
 			for (int i = 0; i <= mid; i++)
 				half1.add(temp.get(i));
@@ -212,58 +212,53 @@ public class Population {
 			descendingPopulation(half1);
 			descendingPopulation(half2);
 			 
-			System.out.println(half1.size() + " " + half2.size());
-			temp = merge(half1, half2);
+			merge(temp, half1, half2);
 		 }
 		 
 		 for (int k = 0; k < list.size(); k++)
 			list.set(k, temp.get(k));
-			
 	}
 	
 	/** Merges the two arrays (the halves in merge sort)
+	 *  @param list		the array to be merged		
 	 *  @param half1	one of the two arrays to be merged
 	 *  @param half2	the other of the two arrays to be merge
-	 *  @return merged		the merged array
 	 */
-	public List<City> merge(List<City> half1, List<City> half2) {
+	public void merge(List<City> list, List<City> half1, List<City> half2) {
 		List<City> merged = new ArrayList<City>();
 		int ind1 = 0;
 		int ind2 = 0;
-		int index = 0;
-		while (index < half1.size() + half2.size() && ind1 < half1.size() && ind2 < half2.size()) {
+		while (ind1 < half1.size() && ind2 < half2.size()) {
 			if (half1.get(ind1).compareTo(half2.get(ind2)) > 0) {
-				merged.set(index, half1.get(ind1));
+				merged.add(half1.get(ind1));				
 				ind1++;
 			}
 			else if (half1.get(ind1).compareTo(half2.get(ind2)) < 0) {
-				merged.set(index, half2.get(ind2));
+				merged.add(half2.get(ind2));
 				ind2++;
 			}
 			else {
-				merged.set(index, half1.get(ind1));
-				index++;
-				merged.set(index, half2.get(ind2));
+				merged.add(half1.get(ind1));
+				merged.add(half2.get(ind2));
 				ind1++;
 				ind2++;
 			}
-			index++;
 		}
 		
 		if (ind1 == half1.size()) {
 			for (int a = half2.size() - 1; a >= ind2; a--) {
-				merged.set(index, half2.get(a));
-				index++;
+				merged.add(half2.get(a));
 			}
 		}
 		else if (ind2 == half2.size()) {
 			for (int b = half1.size() - 1; b >= ind1; b--) {
-				merged.set(index, half1.get(b));
-				index++;
+				merged.add(half1.get(b));
 			}
 		}
 		
-		return merged;
+		for (int z = 0; z < merged.size(); z++) {
+			list.set(z, merged.get(z));
+		}
 	}
 	
 	/** Sorts cities in ascending order by name using insertion sort.
