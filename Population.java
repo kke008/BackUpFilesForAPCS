@@ -1,8 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
 /**
- *	Population - <description goes here>
+ *	Population - uses a file with the name, state, population, and designation
+ * 				of over 30,000 cities in the US.
+ * 		Program prints a list of cities and their information based on user input.
+ * 		Ex. printing a list of the 50 most populous cities.
+ * 		Program creates lists by creating and sorting a List of all the cities
+ * 		with insertion, selection, and merge sorts. The amount of time it takes
+ * 		to sort is also recorded and reported to the user.
  *
  *	Requires FileUtils and Prompt classes.
  *
@@ -49,45 +56,42 @@ public class Population {
 	 *  menu. Calls appropriate methods for appropriate response.
 	 */
 	public void run() {
-		fillCities();
-		printByPopulation(true);
+		fillCities();	// making list of citiesn
+		
+		// printing welcome information for the user / prompting the user
 		printIntroduction();
 		System.out.printf("%d cities in database\n", cities.size());
 		printMenu();
+		
 		int choice = 0;
-		while (choice != 9) {
-			choice = Prompt.getInt("\nEnter selection ");
-			
+		while (choice != 9) {	// responding to user's choice:
+			choice = Prompt.getInt("\nEnter selection");
 			if (choice != 9) {
-				///long startMillisec = System.currentTimeMillis();	!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				if (choice == 1)	// print 50 least populous cities
+				long startMillisec = System.currentTimeMillis();	// timer
+				if (choice == 1)	// prints 50 least populous cities
 					printByPopulation(true);
 				else if (choice == 2)
 					printByPopulation(false);
 					
-				else if (choice == 3)
+				else if (choice == 3)	// prints cities whose names are among the
+										// first 50 alphabetically
 					printByName(true);
 				else if (choice == 4)
 					printByName(false);
 					
-				else if (choice == 5) {
-					String givenState = Prompt.getString("Enter state name" + 
-						" (ie. Alabama) ");
-					mostPopulousCities(givenState);
-				}
+				else if (choice == 5)	// prints most populous cities in given state
+					mostPopulousCities();
 					
-				else if (choice == 6) {
-					String givenCity = Prompt.getString("Enter city name ");
-					listCities(givenCity);
-				}
+				else if (choice == 6)	// prints all cities of same name
+					listCities();
 				
-				/*
 				long endMillisec = System.currentTimeMillis();
 				System.out.printf("\nElapsed time: %d milliseconds\n\n", 
 					endMillisec - startMillisec + 1);
-					*///										!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			}
 		}
+		// printing ending message:
+		System.out.println("\n\nThanks for using Population!");
 	}
 	
 	/** Prints 50 least populous cities.
@@ -104,13 +108,12 @@ public class Population {
 			System.out.println("Fifty most populous cities");
 		}
 		
-		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+		System.out.printf("     %-22s %-22s %-12s %12s\n", "State", "City", 
 			"Type", "Population");
 		
 		for (int i = 0; i < 50; i++) {
 			City city = cities.get(i);
-			System.out.printf("%5s%-22s%-22s%-11s%11d\n", i + 1 + ":", 
-				city.getState(), city.getName(), city.getType(), city.getPopulation());
+			System.out.printf(i + 1 + ":   " + city.toString());
 		}	
 	}
 	
@@ -129,13 +132,12 @@ public class Population {
 			System.out.println("Fifty cities sorted by name descending\n");
 		}
 		
-		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+		System.out.printf("     %-22s %-22s %-12s %12s\n", "State", "City", 
 			"Type", "Population");
 			
-		for (int i = 0; i < 4; i++) {	// CHANGE BACK TO 50!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		for (int i = 0; i < 50; i++) {
 			City city = cities.get(i);
-			System.out.printf("%5s%-22s%-22s%-11s%11d\n", i + 1 + ":", 
-				city.getState(), city.getName(), city.getType(), city.getPopulation());
+			System.out.printf(i + 1 + ":   " + city.toString()); 
 		}	
 	}
 	
@@ -167,7 +169,7 @@ public class Population {
 	 *	@param x		index of first object to swap
 	 *	@param y		index of second object to swap
 	 */
-	private void swap(List<City> list, int x, int y) {
+	public void swap(List<City> list, int x, int y) {
 		City atX = list.get(x);
 		City atY = list.get(y);
 		list.remove(x);
@@ -212,7 +214,7 @@ public class Population {
 			descendingPopulation(half1);
 			descendingPopulation(half2);
 			 
-			merge(temp, half1, half2);
+			merge(temp, half1, half2, 'p');
 		 }
 		 
 		 for (int k = 0; k < list.size(); k++)
@@ -220,20 +222,34 @@ public class Population {
 	}
 	
 	/** Merges the two arrays (the halves in merge sort)
-	 *  @param list		the array to be merged		
-	 *  @param half1	one of the two arrays to be merged
-	 *  @param half2	the other of the two arrays to be merge
+	 *  @param list			the array to be merged		
+	 *  @param half1		one of the two arrays to be merged
+	 *  @param half2		the other of the two arrays to be merge
+	 *  @param popOrName	whether sorting based on population or name
 	 */
-	public void merge(List<City> list, List<City> half1, List<City> half2) {
+	public void merge(List<City> list, List<City> half1, List<City> half2, char popOrName) {
 		List<City> merged = new ArrayList<City>();
 		int ind1 = 0;
 		int ind2 = 0;
 		while (ind1 < half1.size() && ind2 < half2.size()) {
-			if (half1.get(ind1).compareTo(half2.get(ind2)) > 0) {
+			int diff = 0;
+			if (popOrName == 'p')
+				diff = half1.get(ind1).compareTo(half2.get(ind2));
+			else if (popOrName == 'n') {
+				int z = 0;
+				String name1 = half1.get(ind1).getName();
+				String name2 = half2.get(ind2).getName();
+				while (diff == 0 && z < name1.length() && z < name2.length()) {
+					diff = name1.charAt(z) - name2.charAt(z);	
+					z++;
+				}
+			}
+				
+			if (diff > 0) {
 				merged.add(half1.get(ind1));				
 				ind1++;
 			}
-			else if (half1.get(ind1).compareTo(half2.get(ind2)) < 0) {
+			else if (diff < 0) {
 				merged.add(half2.get(ind2));
 				ind2++;
 			}
@@ -268,10 +284,8 @@ public class Population {
 		for (int i = 1; i < list.size(); i++) {
 			City temp = list.get(i);
 			int index = i;
-			while (index > 0 && temp.compareTo(list.get(index - 1)) < 0){
-				list.set(index, list.get(index - 1));
+			while (index > 0 && temp.getName().compareTo(list.get(index - 1).getName()) < 0)
 				index--;
-			}
 			list.set(index, temp);
 		} 
 	}
@@ -281,71 +295,86 @@ public class Population {
 	 */
 	public void descendingName(List<City> list) {	//////////////////////////////////////////////////////////////////////////
 		List<City> temp = list;
-		if (temp.size() == 2 && temp.get(1).compareTo(temp.get(0)) > 0)
+		if (temp.size() == 2 && temp.get(1).getName().compareTo(temp.get(0).getName()) > 0)
 			swap(temp, 0, 1);
 			
 		else if (temp.size() > 2) {
+			int mid = (temp.size() - 1) / 2;
 			List<City> half1 = new ArrayList<City>();
-			for (int i = 0; i < temp.size()/2; i++)
-				half1.set(i, temp.get(i));
+			for (int i = 0; i <= mid; i++)
+				half1.add(temp.get(i));
 			
 			List<City> half2 = new ArrayList<City>();
-			for (int j = 0; j < temp.size() - temp.size()/2; j++)
-				half2.set(j, temp.get(j + temp.size()/2));
+			for (int j = mid + 1; j < temp.size(); j++)
+				half2.add(temp.get(j));
 			
 			descendingName(half1);
 			descendingName(half2);
-			 
-			temp = merge(half1, half2);
+			merge(temp, half1, half2, 'n');
 		 }
 		 
 		 for (int k = 0; k < list.size(); k++)
 			list.set(k, temp.get(k));
 	}
 	
-	/** Prints most populous city in given state.
-	 *  @param stateName	name of state to search in
+	/** Prints at most 50 of the most populous cities in a given state.
 	 */
-	public void mostPopulousCities(String stateName) {
+	public void mostPopulousCities() {
+		String stateName = "";
 		List<City> inState = new ArrayList<City>();
-		for (int i = 0; i < cities.size(); i++) {	// making list of cities in state
-			if (cities.get(i).getState().equals(stateName))
-				inState.add(cities.get(i));
+		while (inState.size() == 0) { // making list of cities in state
+			stateName = Prompt.getString("Enter state name (ie. Alabama)");
+			System.out.println();
+			
+			for (int i = 0; i < cities.size(); i++)
+				if (cities.get(i).getState().equals(stateName))
+					inState.add(cities.get(i));
+			
+			if (inState.size() == 0)
+				System.out.println("ERROR: " + stateName + " is not valid");
 		}
 		
-		descendingPopulation(inState);
+		ascendingPopulation(inState);
 		System.out.printf("Fifty most populous cities in %s\n", stateName);
-		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+		System.out.printf("     %-22s %-22s %-12s %12s\n", "State", "City", 
 			"Type", "Population");
 			
-		for (int j = 0; j < 50; j++) {
-			City city = cities.get(j);
-			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
-				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
+		int limit = 50;
+		if (inState.size() < 50)
+			limit = inState.size();
+		
+		for (int j = 0; j < limit; j++) {
+			City city = inState.get(inState.size() - 1 - j);
+			System.out.println(j + 1 + ":   " + city.toString()); 
 		}
 	}
 	
 	/** Prints all the cities of a given name, sorted by population.
-	 *  @param cityName		name of city to search for
 	 */
-	public void listCities(String cityName) {
+	public void listCities() {
+		String cityName = "";
 		List<City> ofName = new ArrayList<City>();
 		do{
+			cityName = Prompt.getString("Enter city name");
+			System.out.println();
+			
 			for (int i = 0; i < cities.size(); i++)	{	// making list of cities with same name
 				if (cities.get(i).getName().equals(cityName))
 					ofName.add(cities.get(i));
 			}
+			
+			if (ofName.size() == 0)
+				System.out.println("ERROR: " + cityName + " is not valid");
 		} while (ofName.size() == 0);
 		
-		descendingPopulation(ofName);
+		ascendingPopulation(ofName);
 		System.out.printf("City %s by population\n", cityName);
-		System.out.printf("%5s%-22s%-22s%-11s%11s\n", " ", "State", "City", 
+		System.out.printf("     %-22s %-22s %-12s %12s\n", "State", "City", 
 			"Type", "Population");
 			
 		for (int j = 0; j < ofName.size(); j++) {
-			City city = cities.get(j);
-			System.out.printf("%5s%-22s%-22s%-11s%11d\n", j + 1 + ":", 
-				city.getState(), city.getName(), city.getType(), city.getPopulation()); 
+			City city = ofName.get(ofName.size() - 1 - j);
+			System.out.println(j + 1 + ":   " + city.toString()); 
 		}
 	}
 }
