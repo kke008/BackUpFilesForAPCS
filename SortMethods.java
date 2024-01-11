@@ -1,203 +1,148 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;		// for testing purposes
+
 /**
- *	SortMethods - Sorts an array of Integers in ascending order.
+ *	SortMethods - Sorts an ArrayList of Strings in ascending order.
  *
- *	@author Mr.Greenstein and Karen Ke
- *	@since	November 30, 2023
+ *	Requires FileUtils class to compile.
+ *	Requires file randomWords.txt to execute a test run.
+ *
+ *	@author	
+ *	@since	
  */
 public class SortMethods {
 	
 	/**
-	 *	Bubble Sort algorithm - in ascending order
-	 *	@param arr		array of Integer objects to sort
+	 *	Merge Sort algorithm - in ascending order
+	 *	@param arr		List of String objects to sort
 	 */
-	public void bubbleSort(Integer [] arr) {
-		for (int outer = arr.length - 1; outer > 0; outer--)
-			for (int inner = 0; inner < outer; inner++)
-				if (arr[inner].compareTo(arr[inner + 1]) > 0)
-					swap(arr, inner, inner + 1);
+	public void mergeSort(List<String> arr) {
+		mergeSortRecurse(arr, 0, arr.size() - 1);
 	}
 	
 	/**
-	 *	Swaps two Integer objects in array arr
-	 *	@param arr		array of Integer objects
-	 *	@param x		index of first object to swap
-	 *	@param y		index of second object to swap
+	 *	Recursive mergeSort method.
+	 *	@param arr		List of String objects to sort
+	 *	@param first	first index of arr to sort
+	 *	@param last		last index of arr to sort
 	 */
-	private void swap(Integer[] arr, int x, int y) {
-		Integer temp = arr[x];
-		arr[x] = arr[y];
-		arr[y] = temp;
-	}
-	
-	/**
-	 *	Selection Sort algorithm - in ascending order (you implement)
-	 *	@param arr		array of Integer objects to sort
-	 */
-	public void selectionSort(Integer [] arr) {
-		int lengthOfUnsorted;
-		for (lengthOfUnsorted = arr.length; lengthOfUnsorted > 1; lengthOfUnsorted--) {
-			int indexOfMax = 0;
-			for (int inner = 0; inner < lengthOfUnsorted; inner++) {
-				if (arr[inner].compareTo(arr[indexOfMax]) > 0)
-					indexOfMax = inner;
-			}
-			swap(arr, indexOfMax, lengthOfUnsorted - 1);
+	public void mergeSortRecurse(List<String> arr, int first, int last) {
+		// insert your code here
+		List<String> temp = arr;
+			
+		if (last - first == 1 && temp.get(last).compareTo(temp.get(first)) < 0) {
+			String x = temp.get(last);
+			temp.set(last, temp.get(first));
+			temp.set(first, temp.get(last));
 		}
-	}
-	
-	/**
-	 *	Insertion Sort algorithm - in ascending order (you implement)
-	 *	@param arr		array of Integer objects to sort
-	 */
-	public void insertionSort(Integer [] arr) {
-		for (int i = 1; i < arr.length; i++) {
-			Integer temp = arr[i];
-			int index = i;
-			while (index > 0 && temp < arr[index - 1]){
-				arr[index] = arr[index - 1];
-				index--;
-			}
-			arr[index] = temp;
-		} 
-	}
-	
-	/**
-	 *	Merge Sort algorithm - in ascending order (you implement)
-	 *	@param arr		array of Integer objects to sort
-	 */
-	 public void mergeSort(Integer [] arr) {
-		Integer[] temp = arr;
-		if (temp.length == 2 && temp[1] < temp[0])
-			swap(temp, 0, 1);
 			
-		else if (temp.length > 2) {
-			Integer[] half1 = new Integer[temp.length / 2];
-			for (int i = 0; i < half1.length; i++)
-				half1[i] = temp[i];
+		else if (last - first > 1) {
+			int halfInd = (first + last) / 2;
+			List<String> half1 = new ArrayList<String>(halfInd + 1);
+			for (int i = first; i <= halfInd; i++)
+				half1.add(temp.get(i));
+				
+			List<String> half2 = new ArrayList<String>(temp.size() - halfInd - 1);
+			for (int j = halfInd + 1; j <= last; j++)
+				half2.add(temp.get(j));
 			
-			Integer[] half2 = new Integer[temp.length - temp.length / 2];
-			for (int j = 0; j < half2.length; j++)
-				half2[j] = temp[j + temp.length / 2];
-			
-			mergeSort(half1);
-			mergeSort(half2);
-			 
-			temp = merge(half1, half2);
+			mergeSortRecurse(half1, 0, half1.size());
+			mergeSortRecurse(half2, 0, half2.size());
+					 
+			for (int k = first; k <= halfInd; k++)
+				arr.set(k, half1.get(k - first));
+				
+			for (int l = halfInd + 1; l <= halfInd; l++)
+				arr.set(l, half1.get(l - halfInd - 1));
+				
+			merge(temp, first, halfInd, last);
 		 }
-		 
-		 for (int k = 0; k < arr.length; k++)
-			arr[k] = temp[k];
+		 for (int m = first; m <= last; m++)
+			arr.set(m, temp.get(m));
 	}
 	
-	/** Merges the two arrays (the halves in merge sort)
-	 *  @param half1	one of the two arrays to be merged
-	 *  @param half2	the other of the two arrays to be merge
-	 *  @return merged		the merged array
+	/**
+	 *	Merge two lists that are consecutive elements in array.
+	 *	@param arr		List of String objects to merge
+	 *	@param first	first index of first list
+	 *	@param mid		the last index of the first list;
+	 *					mid + 1 is first index of second list
+	 *	@param last		last index of second list
 	 */
-	public Integer[] merge(Integer[] half1, Integer[] half2) {
-		Integer[] merged = new Integer[half1.length + half2.length];
-		int ind1 = 0;
-		int ind2 = 0;
-		int index = 0;
-		while (index < merged.length && ind1 < half1.length && ind2 < half2.length) {
-			
-			if (half1[ind1] < half2[ind2]) {
-				merged[index] = half1[ind1];
+	public void merge(List<String> arr, int first, int mid, int last) {
+		// Insert your code here
+		List<String> merged = arr;
+		int ind1 = first;
+		int ind2 = mid + 1;
+		int index = first;
+		
+		while (index <= last && ind1 <= mid && ind2 <= last) {
+			if (arr.get(ind1).compareTo(arr.get(ind2)) < 0) {
+				merged.set(index, arr.get(ind1));
 				ind1++;
 			}
-			else if (half1[ind1] > half2[ind2]) {
-				merged[index] = half2[ind2];
+			else if (arr.get(ind1).compareTo(arr.get(ind2)) > 0) {
+				merged.set(index, arr.get(ind2));
 				ind2++;
 			}
 			else {
-				merged[index] = half1[ind1];
-				index++;
-				merged[index] = half2[ind2];
+				merged.set(index, arr.get(ind1));;
 				ind1++;
+				index++;
+				merged.set(index, arr.get(ind2));
 				ind2++;
 			}
 			index++;
 		}
 		
-		if (ind1 == half1.length) {
-			for (int a = ind2; a < half2.length; a++) {
-				merged[index] = half2[a];
-				index++;
+		if (index <= last) {
+			if (ind1 > mid) {		// fill in rest with second half
+				for (int y = ind2; y <= last; y++) {
+					merged.set(index, arr.get(y));
+					index++;
+				}
+			}
+			
+			else {		// fill in rest with first half
+				for (int z = ind1; z <= mid; z++) {
+					merged.set(index, arr.get(z));
+					index++;
+				}
 			}
 		}
-		else if (ind2 == half2.length) {
-			for (int b = ind1; b < half1.length; b++) {
-				merged[index] = half1[b];
-				index++;
-			}
-		}
-		
-		return merged;
 	}
-	/*****************************************************************/
-	/************************* For Testing ***************************/
-	/*****************************************************************/
+
 	
 	/**
-	 *	Print an array of Integers to the screen
-	 *	@param arr		the array of Integers
+	 *	Print an List of Strings to the screen
+	 *	@param arr		the List of Strings
 	 */
-	public void printArray(Integer[] arr) {
-		if (arr.length == 0) System.out.print("(");
-		else System.out.printf("( %4d", arr[0]);
-		for (int a = 1; a < arr.length; a++) {
-			if (a % 10 == 0) System.out.printf(",\n  %4d", arr[a]);
-			else System.out.printf(", %4d", arr[a]);
+	public void printArray(List<String> arr) {
+		if (arr.size() == 0) System.out.print("(");
+		else System.out.printf("( %-15s", arr.get(0));
+		for (int a = 1; a < arr.size(); a++) {
+			if (a % 5 == 0) System.out.printf(",\n  %-15s", arr.get(a));
+			else System.out.printf(", %-15s", arr.get(a));
 		}
 		System.out.println(" )");
 	}
-
+	
+	/*************************************************************/
+	/********************** Test program *************************/
+	/*************************************************************/
+	private final String FILE_NAME = "randomWords.txt";
+	
 	public static void main(String[] args) {
 		SortMethods se = new SortMethods();
 		se.run();
 	}
 	
 	public void run() {
-		Integer[] arr = new Integer[10];
-		// Fill arr with random numbers
-		for (int a = 0; a < 10; a++)
-			arr[a] = (int)(Math.random() * 100) + 1;
-		System.out.println("\nBubble Sort");
-		System.out.println("Array before sort:");
-		printArray(arr);
-		System.out.println();
-		bubbleSort(arr);
-		System.out.println("Array after sort:");
-		printArray(arr);
-		System.out.println();
-
+		List<String> arr = new ArrayList<String>();
+		// Fill List with random words from file		
+		fillArray(arr);
 		
-		for (int a = 0; a < 10; a++)
-			arr[a] = (int)(Math.random() * 100) + 1;
-		System.out.println("\nSelection Sort");
-		System.out.println("Array before sort:");
-		printArray(arr);
-		System.out.println();
-		selectionSort(arr);
-		System.out.println("Array after sort:");
-		printArray(arr);
-		System.out.println();
-		
-		
-		for (int a = 0; a < 10; a++)
-			arr[a] = (int)(Math.random() * 100) + 1;
-		System.out.println("\nInsertion Sort");
-		System.out.println("Array before sort:");
-		printArray(arr);
-		System.out.println();
-		insertionSort(arr);
-		System.out.println("Array after sort:");
-		printArray(arr);
-		System.out.println();
-
-		
-		for (int a = 0; a < 10; a++)
-			arr[a] = (int)(Math.random() * 100) + 1;
 		System.out.println("\nMerge Sort");
 		System.out.println("Array before sort:");
 		printArray(arr);
@@ -206,5 +151,13 @@ public class SortMethods {
 		System.out.println("Array after sort:");
 		printArray(arr);
 		System.out.println();
+	}
+	
+	// Fill String array with words
+	public void fillArray(List<String> arr) {
+		Scanner inFile = FileUtils.openToRead(FILE_NAME);
+		while (inFile.hasNext())
+			arr.add(inFile.next());
+		inFile.close();
 	}
 }
