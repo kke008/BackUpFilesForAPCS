@@ -8,8 +8,8 @@
  */
 public class SudokuMaker {
 
-	private int[][] puzzle;
-		
+	private int[][] puzzle;	// the puzzle
+	
 	/**
 	 *	printPuzzle - prints the Sudoku puzzle with borders
 	 *	If the value is 0, then print an empty space; otherwise, print the number.
@@ -50,22 +50,45 @@ public class SudokuMaker {
 	 */
 	public boolean createPuzzle(int row, int column) {
 		boolean valWorks = false;
-		int val = Math.random()*9 + 1;
+		int val = (int)(Math.random()*9 + 1);
 		
-		while (valWorks == false////////////////////////////////////////////////////////////////////////////////////
-			if (puzzle[r] == 
-		}
+		//while (valWorks == false) {
+		//	if (puzzle[row] == 
+		//}
 		
 		return valWorks;
 	}
 	
+	public int getVal(int r, int c) {
+		int[] nums = new int[9];
+		for (int i = 0; i < 9; i++) {
+			int num = (int)(Math.random()*9 + 1);
+			boolean works = true;
+			int j = 0;
+			while (j < i && works) {
+				if (num == nums[j])
+					works = false;
+			}
+			
+			if (!works) {
+				num = (int)(Math.random()*9 + 1);
+				i--;
+			}
+		}
+		
+		int val = -1;
+		for (int k = 0; k < 9; k++) {
+			if (
+		}
+	}
+	
 	public static void main(String[] args) {
-		SodokuMaker sm = SodokuMaker.java();
-		sm.createPuzzle();
+		SudokuMaker sm = new SudokuMaker();
+		sm.createPuzzle(0,0);
 		sm.printPuzzle();
 	}
 	
-	public SodokuMaker() {
+	public SudokuMaker() {
 		for (int r = 0; r < puzzle.length; r++) {
 			for (int c = 0; c < puzzle[0].length; c++)
 				puzzle[r][c] = 0;
