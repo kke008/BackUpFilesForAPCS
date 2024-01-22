@@ -49,13 +49,13 @@ public class SudokuMaker {
 	 *  @param valWorks	whether or not the value works
 	 */
 	public boolean createPuzzle(int r, int c) {
-		int[] nums = new int[9];
+		int[] vals = new int[9];	// list of integers 1-9 in random order
 		for (int i = 0; i < 9; i++) {
 			int num = (int)(Math.random()*9 + 1);
 			boolean works = true;
 			int j = 0;
 			while (j < i && works) {
-				if (num == nums[j])
+				if (num == vals[j])
 					works = false;
 			}
 			
@@ -64,6 +64,13 @@ public class SudokuMaker {
 				i--;
 			}
 		}
+		
+		int x = 0;	// number of vals checked
+		int val;
+		do {
+			val = vals[x];
+		}while (x < 9 && !valWorks(val, r, c));
+		
 		
 		boolean valWorks = true;
 		int k;
@@ -79,8 +86,37 @@ public class SudokuMaker {
 					valWorks = false;
 			}
 		}
+	}
+	
+	/**
+	 *  Checks if a given value works at the given grid location, determined
+	 *  by whether or not there are duplicates in the row, column, and
+	 * 	the 9 x 9 square it is in
+	 * 
+	 *   @param val		value being checked
+	 *   @param row		row in grid with value
+	 * 	 @param col		column in grid with value
+	 * 	 @return		whether or not value works
+	 */
+	public static boolean valWorks(int val, int row, int col) {
+		for (int i = 0; i < col; i++) {
+			if (val == puzzle[row][i])
+				return false;
+		}
 		
-		if (k == 9) {
+		for (int j = 0; j < row; j++) {
+			if (val == puzzle[j][1])
+				return false;
+		}
+		
+		/////////////////////////////////////////////////CHECK IF SURROUNDING SQUARE WORKS
+		
+		return true;
+	}
+	
+	
+	/*
+	 * if (k == 9) {
 			// if valWorks and not last row or not last column
 			if (valWorks && (r < puzzle.length - 1 || c < puzzle[r].length - 1) {
 				if (c >= puzzle[r].length - 1)	// if last column:
@@ -89,9 +125,10 @@ public class SudokuMaker {
 					createPuzzle(r, c + 1);
 			}
 			
-			else/////////////////////////////////////////////////////////////////////////////////////////////////
+			else
 		}
-	}
+		*/
+	
 	
 	public static void main(String[] args) {
 		SudokuMaker sm = new SudokuMaker();
