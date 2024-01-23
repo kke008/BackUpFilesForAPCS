@@ -6,9 +6,134 @@
  *  @since January 16, 2024
  *
  */
+ 
+ 
+ /*
+  * CURRENTLY:
+  *  - only adds values to first column and last row of puzzle
+  */
+  
 public class SudokuMaker {
 
 	private int[][] puzzle;	// the puzzle
+	private int count = 0; 	///////////////////////////////////////////////////////////////////////////////
+	
+	public SudokuMaker() {
+		puzzle = new int[9][9];
+		for (int r = 0; r < puzzle.length; r++) {
+			for (int c = 0; c < puzzle[0].length; c++)
+				puzzle[r][c] = 0;
+		}
+	}
+	
+	public static void main(String[] args) {
+		SudokuMaker sm = new SudokuMaker();
+		sm.createPuzzle(0,0);
+	}
+	
+	/**
+	 * creates the Sodoku puzzle as a 2D array (puzzle) with int values
+	 * from 1-9, starting at puzzle[0][0] and working row by row. 
+	 * - If the value at the current location is not duplicated, createPuzzle
+	 *   is called for the next grid location.
+	 * - If the value at the current location is duplicated, other random 
+	 *   values from 1-9 are tested
+	 *    - if all 9 values fail, createPuzzle is called for the previous
+	 * 		grid location and a different random value is assigned
+	 * 
+	 *  @param r		the row of the current value in the grid
+	 *  @param c	the column of the current value in the grid
+	 *  @param valWorks	whether or not the value works
+	 */
+	public void createPuzzle(int r, int c) {	////////////////////////////// STACK OVERFLOW ERROR HERE
+		int val = getVal(r, c);
+		if (val == -1) {		// need to go to prev grid square
+			if (c <= 0)
+				createPuzzle(r - 1, puzzle[r - 1].length - 1);
+			else if (
+				createPuzzle(r, c - 1);
+		}
+		
+		else {
+			puzzle[r][c] = val;
+			if (r >= puzzle.length - 1 && c >= puzzle[r].length - 1)
+				printPuzzle();
+				
+			else if (c < puzzle[r].length - 1)
+				createPuzzle(r, c + 1);
+				
+			else
+				createPuzzle(r + 1, 0);
+		}
+	}
+	
+	/**
+	 *  creates a randomized list of integers from 1-9 then checks each
+	 *  integer until one works 
+	 * 
+	 *  @param row		row of position that value is for
+	 * 	@param col		column of position that value is for
+	 * 	@return 		if val works, returns val
+	 * 					if val doesn't work, returns -1
+	 */
+	public int getVal(int row, int col) {
+		int[] vals = new int[9];	// list of integers 1-9 in random order
+		for (int i = 1; i < 10; i++) {
+			int ind = 0;
+			while (vals[ind] != 0) {
+				ind = (int)(Math.random() * 9);
+			}
+			vals[ind] = i;
+		}
+		
+		int x = 0;	// number of vals checked
+		int val;
+		do {
+			val = vals[x];
+			x++;
+		}while (x < 9 && !valWorks(val, row, col));
+		
+		if (x >= 9)
+			return -1;
+			
+		else
+			return val;	
+	}
+	
+	/**
+	 *  Checks if a given value works at the given grid location, determined
+	 *  by whether or not there are duplicates in the row, column, and
+	 * 	the 9 x 9 square it is in
+	 * 
+	 *   @param val		value being checked
+	 *   @param row		row in grid with value
+	 * 	 @param col		column in grid with value
+	 * 	 @return		whether or not value works
+	 */
+	public boolean valWorks(int val, int row, int col) {
+
+		for (int i = 0; i < col; i++) {		// checks row for duplicates
+			if (val == puzzle[row][i])
+				return false;
+		}
+		
+		for (int j = 0; j < row; j++) {		// checks column for duplicates
+			if (val == puzzle[j][col])
+				return false;
+		}
+		
+		int startRow = row - row % 3;
+		int startCol = col - col % 3;
+		
+		for (int k = 0; k < 3; k++) {		// checks 9 x 9 for duplicates
+			for (int l = 0; l < 3; l++) {
+				if (val == puzzle[startRow + k][startCol + l])
+				return false;
+			}
+		}
+		
+		return true;
+	}
 	
 	/**
 	 *	printPuzzle - prints the Sudoku puzzle with borders
@@ -31,115 +156,6 @@ public class SudokuMaker {
 				System.out.print("  |\n  +-----------+-----------+-----------+\n");
 			else
 				System.out.print("  |\n");
-		}
-	}
-	
-	/**
-	 * creates the Sodoku puzzle as a 2D array (puzzle) with int values
-	 * from 1-9, starting at puzzle[0][0] and working row by row. 
-	 * - If the value at the current location is not duplicated, createPuzzle
-	 *   is called for the next grid location.
-	 * - If the value at the current location is duplicated, other random 
-	 *   values from 1-9 are tested
-	 *    - if all 9 values fail, createPuzzle is called for the previous
-	 * 		grid location and a different random value is assigned
-	 * 
-	 *  @param r		the row of the current value in the grid
-	 *  @param c	the column of the current value in the grid
-	 *  @param valWorks	whether or not the value works
-	 */
-	public boolean createPuzzle(int r, int c) {
-		int[] vals = new int[9];	// list of integers 1-9 in random order
-		for (int i = 0; i < 9; i++) {
-			int num = (int)(Math.random()*9 + 1);
-			boolean works = true;
-			int j = 0;
-			while (j < i && works) {
-				if (num == vals[j])
-					works = false;
-			}
-			
-			if (!works) {
-				num = (int)(Math.random()*9 + 1);
-				i--;
-			}
-		}
-		
-		int x = 0;	// number of vals checked
-		int val;
-		do {
-			val = vals[x];
-		}while (x < 9 && !valWorks(val, r, c));
-		
-		
-		boolean valWorks = true;
-		int k;
-		for (k = 0; k < 9; k++) {	// checking all possible values of val
-			int val = nums[k];
-			for (int l = 0; l < puzzle[r].length(); l++) {	// checking row
-				if (val == puzzle[r][l])
-					valWorks = false;
-			}
-			
-			for (int m = 0; m < puzzle.length; m++) {	// checking column
-				if (val == puzzle[m][c])
-					valWorks = false;
-			}
-		}
-	}
-	
-	/**
-	 *  Checks if a given value works at the given grid location, determined
-	 *  by whether or not there are duplicates in the row, column, and
-	 * 	the 9 x 9 square it is in
-	 * 
-	 *   @param val		value being checked
-	 *   @param row		row in grid with value
-	 * 	 @param col		column in grid with value
-	 * 	 @return		whether or not value works
-	 */
-	public static boolean valWorks(int val, int row, int col) {
-		for (int i = 0; i < col; i++) {
-			if (val == puzzle[row][i])
-				return false;
-		}
-		
-		for (int j = 0; j < row; j++) {
-			if (val == puzzle[j][1])
-				return false;
-		}
-		
-		/////////////////////////////////////////////////CHECK IF SURROUNDING SQUARE WORKS
-		
-		return true;
-	}
-	
-	
-	/*
-	 * if (k == 9) {
-			// if valWorks and not last row or not last column
-			if (valWorks && (r < puzzle.length - 1 || c < puzzle[r].length - 1) {
-				if (c >= puzzle[r].length - 1)	// if last column:
-					createPuzzle(r + 1, 0);
-				else 	// if last row
-					createPuzzle(r, c + 1);
-			}
-			
-			else
-		}
-		*/
-	
-	
-	public static void main(String[] args) {
-		SudokuMaker sm = new SudokuMaker();
-		sm.createPuzzle(0,0);
-		sm.printPuzzle();
-	}
-	
-	public SudokuMaker() {
-		for (int r = 0; r < puzzle.length; r++) {
-			for (int c = 0; c < puzzle[0].length; c++)
-				puzzle[r][c] = 0;
 		}
 	}
 }
