@@ -10,13 +10,12 @@
  
  /*
   * CURRENTLY:
-  *  - only adds values to first column and last row of puzzle
+  *  - how to make it recurse back properly?
   */
   
 public class SudokuMaker {
 
 	private int[][] puzzle;	// the puzzle
-	private int count = 0; 	///////////////////////////////////////////////////////////////////////////////
 	
 	public SudokuMaker() {
 		puzzle = new int[9][9];
@@ -45,26 +44,40 @@ public class SudokuMaker {
 	 *  @param c	the column of the current value in the grid
 	 *  @param valWorks	whether or not the value works
 	 */
-	public void createPuzzle(int r, int c) {	////////////////////////////// STACK OVERFLOW ERROR HERE
+	public boolean createPuzzle(int r, int c) {
+		boolean nextWorked = true;
 		int val = getVal(r, c);
 		if (val == -1) {		// need to go to prev grid square
-			if (c <= 0)
+			return false;
+			/*if (c == 0 && r - 1 >= 0)		// need to go to prev row
 				createPuzzle(r - 1, puzzle[r - 1].length - 1);
-			else if (
+			
+			else if (r >= 0 && c - 1 >= 0)
 				createPuzzle(r, c - 1);
+				*/
 		}
 		
 		else {
 			puzzle[r][c] = val;
-			if (r >= puzzle.length - 1 && c >= puzzle[r].length - 1)
-				printPuzzle();
+			
+			if (c + 1 == puzzle[r].length && r + 1 <= puzzle.length - 1)
+				nextWorked = createPuzzle(r + 1, 0);
 				
-			else if (c < puzzle[r].length - 1)
-				createPuzzle(r, c + 1);
-				
+			//else if (c + 1 < puzzle[r].length)
 			else
-				createPuzzle(r + 1, 0);
+				nextWorked = createPuzzle(r, c + 1);
 		}
+		
+		if (!nextWorked)
+			createPuzzle(r, c);
+		
+		//if (r >= puzzle.length - 1 && c >= puzzle[r].length - 1)	// at last square
+			
+			System.out.println(r + "\t" + c);
+			printPuzzle();
+			System.out.println("\n\n");	
+			
+		return true;
 	}
 	
 	/**
@@ -128,7 +141,7 @@ public class SudokuMaker {
 		for (int k = 0; k < 3; k++) {		// checks 9 x 9 for duplicates
 			for (int l = 0; l < 3; l++) {
 				if (val == puzzle[startRow + k][startCol + l])
-				return false;
+					return false;
 			}
 		}
 		
