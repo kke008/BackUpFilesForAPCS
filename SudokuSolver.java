@@ -66,7 +66,6 @@ public class SudokuSolver {
 	 * @return		whether or not any values at this location work
 	 */
 	public boolean solvePuzzle(int row, int col) {
-		///if (row == && col == 0 && puzzle[row][col] == 0)/////////////////////////////////////
 		int[] vals = new int[9];	// list of integers 1-9 in random order
 		for (int i = 1; i < 10; i++) {
 			int ind = 0;
@@ -76,33 +75,27 @@ public class SudokuSolver {
 			vals[ind] = i;
 		}
 		
-		for (int a = 0; a < 9; a++) {
+		int a = 0;
+		while (a < 9) {
 			int val = vals[a];
-			if (valWorks(val, row, col)) {
+			if (!valWorks(val, row, col))
+				a++;
+				
+			else {
+				puzzle[row][col] = val;
 				int[] coords = nextEmptySpace(row, col);
-				if (coords[0] == -1 || solvePuzzle(coords[0], coords[1]))	///////////////////////// error here
+				System.out.println(coords[0] + "\t" + coords[1]);	////////////////////////////////////
+				boolean works = solvePuzzle(coords[0], coords[1]);		// index is 9 -> out of bounds
+				if (works) {
+					a = 9;
 					return true;
+				}
+				
+				a++;
 			}
 		}
-		
 		puzzle[row][col] = 0;
-		return false;		
-		/*	
-		int val = getVal(row, col);
-		if (val == -1);
-			return false;
-		
-		puzzle[row][col] = val;
-		int[] coords = nextEmptySpace(row, col);
-		int r = coords[0];
-		int col = coords[1];
-		if (r == -1 && c == -1)
-			return true;
-		
-		boolean workes = solvePuzzle(coords[0], coords[1]);
-		if (works)
-			return true;
-			*/
+		return false;
 	}
 	
 	/**
@@ -115,7 +108,7 @@ public class SudokuSolver {
 	 * 	@return 		if val works, returns val
 	 * 					if val doesn't work, returns -1
 	 */
-	public int getVal(int val, int row, int col) {
+	public int getVals(int val, int row, int col) {
 		int[] vals = new int[9];	// list of integers 1-9 in random order
 		for (int i = 1; i < 10; i++) {
 			int ind = 0;
@@ -180,8 +173,11 @@ public class SudokuSolver {
 	 * @param col		column of current grid coordinate
 	 * @return coords	array with coordinates of next empty spot
 	 */
-	public int[] nextEmptySpace(int row, int col) {
-		int[] coords = new int[2];
+	public int[] nextEmptySpace(int row, int col) {		////////////////// ERROR HERE WITH BOUNDS
+		int[] coords = 
+		
+		
+		/*int[] coords = new int[2];
 		while (puzzle[row][col] != 0 && (row < puzzle.length || 
 											col < puzzle[row].length)) {
 			if (col < puzzle[row].length)
@@ -202,6 +198,7 @@ public class SudokuSolver {
 		coords[0] = row;
 		coords[1] = col;
 		return coords;
+		*/
 	}
 	
 	
