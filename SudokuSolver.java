@@ -67,8 +67,27 @@ public class SudokuSolver {
 	 */
 	public boolean solvePuzzle(int row, int col) {
 		///if (row == && col == 0 && puzzle[row][col] == 0)/////////////////////////////////////
-			
-			
+		int[] vals = new int[9];	// list of integers 1-9 in random order
+		for (int i = 1; i < 10; i++) {
+			int ind = 0;
+			while (vals[ind] != 0) {
+				ind = (int)(Math.random() * 9);
+			}
+			vals[ind] = i;
+		}
+		
+		for (int a = 0; a < 9; a++) {
+			int val = vals[a];
+			if (valWorks(val, row, col)) {
+				int[] coords = nextEmptySpace(row, col);
+				if (coords[0] == -1 || solvePuzzle(coords[0], coords[1]))	///////////////////////// error here
+					return true;
+			}
+		}
+		
+		puzzle[row][col] = 0;
+		return false;		
+		/*	
 		int val = getVal(row, col);
 		if (val == -1);
 			return false;
@@ -80,20 +99,23 @@ public class SudokuSolver {
 		if (r == -1 && c == -1)
 			return true;
 		
-		boolean workes = false;
-		works = solvePuzzle(coords[0], coords[1]);
+		boolean workes = solvePuzzle(coords[0], coords[1]);
+		if (works)
+			return true;
+			*/
 	}
 	
 	/**
-	 *  creates a randomized list of integers from 1-9 then checks each
-	 *  integer until one works 
+	 *  checks if a given value works at a given grid position. Value works
+	 *  if it is not repeated in the row, column, or its respective 3 x 3 grid.
 	 * 
+	 *  @param val		value being tested
 	 *  @param row		row of position that value is for
 	 * 	@param col		column of position that value is for
 	 * 	@return 		if val works, returns val
 	 * 					if val doesn't work, returns -1
 	 */
-	public int getVal(int row, int col) {
+	public int getVal(int val, int row, int col) {
 		int[] vals = new int[9];	// list of integers 1-9 in random order
 		for (int i = 1; i < 10; i++) {
 			int ind = 0;
@@ -104,7 +126,6 @@ public class SudokuSolver {
 		}
 		
 		int x = 0;	// number of vals checked
-		int val;
 		do {
 			val = vals[x];
 			x++;
@@ -162,7 +183,7 @@ public class SudokuSolver {
 	public int[] nextEmptySpace(int row, int col) {
 		int[] coords = new int[2];
 		while (puzzle[row][col] != 0 && (row < puzzle.length || 
-											col < puzzle[row].length) {
+											col < puzzle[row].length)) {
 			if (col < puzzle[row].length)
 				col++;
 				
@@ -172,7 +193,7 @@ public class SudokuSolver {
 			}
 		}
 		
-		if (r == puzzle.length - 1 && col == puzzle[row].length - 1) {
+		if (row == puzzle.length - 1 && col == puzzle[row].length - 1) {
 			coords[0] = -1;
 			coords[1] = -1;
 			return coords;
