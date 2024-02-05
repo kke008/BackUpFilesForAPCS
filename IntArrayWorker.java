@@ -167,14 +167,36 @@ public class IntArrayWorker
 		  System.out.println("|");
 	  }
 	  
-	  for (int i = 0; i < matrix.length; i++)
+	  int first = 0;
+	  int last - matrix[0].length - 1;
+	  int row = 0;
+	  while (row < matrix.length) 
 	  {
-		  int mid = matrix[a].length / 2;
-		  for (int j = 0; j < mid; j++)
+		  if (first == last || first > last)
 		  {
-			  temp = matrix[a][j];
-			  matrix[a][j] = matrix[a][]	/////////////////////////////////////////////
+			first = 0;
+			last = matrix[0].length - 1;
+			row++;
 		  }
+
+		  else
+		  {
+			  int temp = matrix[row][first];
+			  matrix[row][first] = matrix[row][last];
+			  matrix[row][last] = temp;
+			  first++;
+			  last--;
+		  }
+	  }
+
+	  System.out.println("Reversed array:");
+	  for (int c = 0; c < matrix.length; c++)
+	  {
+		  for (int d = 0; d < matrix[0].length; d++)
+		  {
+			  System.out.printf("| %d ", matrix[c][d]);
+		  }
+		  System.out.println("|");
 	  }
   }
  
