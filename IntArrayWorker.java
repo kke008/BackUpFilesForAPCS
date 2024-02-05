@@ -168,7 +168,7 @@ public class IntArrayWorker
 	  }
 	  
 	  int first = 0;
-	  int last - matrix[0].length - 1;
+	  int last = matrix[0].length - 1;
 	  int row = 0;
 	  while (row < matrix.length) 
 	  {
