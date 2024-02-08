@@ -153,115 +153,141 @@ public class Picture extends SimplePicture
   /** To pixelate by dividing area into size x size.
     * @param size Side length of square area to pixelate.
     */
-  public void pixelate(int size) {	//////////////////////////////////////// DOESN"T WORK
+  public void pixelate(int size) {	
 	  Pixel[][] pixels = this.getPixels2D();
 	  int r = 0;
 	  int c = 0;
-	  while (r < pixels.length && c < pixles[0].length) {
-		  int totalRed = 0;
-		  int totalGreen = 0;
-		  int totalBlue = 0;
-		  int totalGrids = 0;
-		  int half = size / 2;
-		  for (int r2 = -half; r2 <= half; r2++) {
-			  for (int c2 = -half; c2 <= half; c2++) {
-				  if (r + r1 >= 0 && r + r2 < pixles.length && c + c2 >= 0 &&
-						c + c2 < puzzle[0].length) {
-						totalRed += puzzle[r + r2][c + c2].getRed();		
-						totalGreen += puzzle[r + r2][c + c2].getGreen();		
-						totalBlue += puzzle[r + r2][c + c2].getBlue();	
-						totalGrids++;	
+	  while (r < pixels.length && c < pixels[0].length) {
+		  int red = 0;
+		  int green = 0;
+		  int blue = 0;
+		  int grids = 0;
+		  for (int i = 0; i < size; i++) {
+			  for (int j = 0; j < size; j++) {
+				  if (r + i < pixels.length && c + j < pixels[0].length) {
+					  red += pixels[r + i][c + j].getRed();
+					  green += pixels[r + i][c + j].getGreen();
+					  blue += pixels[r + i][c + j].getBlue();
+					  grids++;
 				  }
 			  }
 		  }
-		  if (totalGrids > 0) {
-			  int red = totalRed / totalGrids;
-			  int green = totalGreen / totalGrids;
-			  int blue = totalBlue / totalGrids;
-			  for (int r2 = -half; r2 <= half; r2++) {
-				for (int c2 = -half; c2 <= half; c2++) {
-					if (r + r1 >= 0 && r + r2 < pixles.length && c + c2 >= 0 &&
-							c + c2 < puzzle[0].length) {
-							puzzle[r + r2][c + c2].setRed	/////////////////////////////////////
-					}
-				}
-			}
-		  }
-		  else {
-			  r++;
-			  c++;
-		  }
-	  }
-	  
-	 /* while (r < pixels.length && c < pixels[0].length) {
-		  int totalR = 0;
-		  int totalG = 0;
-		  int totalB = 0;
-		  int pixelsInGrid = 0;
-		  for (int i = (-size / 2); i < size / 2; i++) {
-			  for (int j = (-size / 2); j < size / 2; j++) {
-				  if (r + i > 0 && r + i < pixels.length &&
-						c + j > 0 && c + j < pixels[0].length) {
-						totalR += pixels[r + i][c + j].getRed();	
-						totalG += pixels[r + i][c + j].getGreen();	
-						totalB += pixels[r + i][c + j].getBlue();	
-						pixelsInGrid++;
-				  }
-			  }
-		  }
-		  int red = totalR / pixelsInGrid;
-		  int green = totalG / pixelsInGrid;
-		  int blue = totalB / pixelsInGrid;
 		  
-		  for (int a = 0; a < pixelsInGrid; a++) {
+		  for (int a = 0; a < size; a++) {
 			  for (int b = 0; b < size; b++) {
-				  pixels[a][b].setRed(red);
-				  pixels[a][b].setGreen(green);
-				  pixels[a][b].setBlue(blue);
+				  if (r + a < pixels.length && c + b < pixels[0].length) {
+					  pixels[r + a][c + b].setRed(red / grids);
+					  pixels[r + a][c + b].setGreen(green / grids);
+					  pixels[r + a][c + b].setBlue(blue / grids);
+				  }
 			  }
 		  }
-		  r += size;
-		  c += size;
-		  */
+		  
+		  if (c + size >= pixels[0].length) {
+			  r += size;
+			  c = 0;
+		  }
+		  else
+			c += size;
 	  }
   }
   
   /** Method that blurs the picture
-    * @param size Blur size, greater is more blur
-    * @return Blurred picture
-    */
-  public Picture blur(int size)	/////////////////////////////////////// DOESN"T WORK
+	* @param size Blur size, greater is more blur
+	* @return Blurred picture
+  */
+  public Picture blur(int size)	//////////////////////////////////////// NO IDEA IF THIS WORKS
+  {
+	Pixel[][] pixels = this.getPixels2D();
+	Picture result = new Picture(pixels.length, pixels[0].length);
+	Pixel[][] resultPixels = result.getPixels2D();
+	
+	int r = 0;
+	int c = 0;
+	int mid = size / 2;
+	while (r < pixels.length && c < pixels[0].length) {
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+		int grids = 0;
+		for (int i = r - mid; i <= r + mid; i++) {
+			for (int j = c - mid; c <= r + mid; j++) {
+				if ( i >= 0 && i < pixels.length && j >=0 && c < pixels[0].length) {
+					if (r + i < pixels.length && c + j < pixels[0].length) {
+					  red += pixels[r + i][c + j].getRed();
+					  green += pixels[r + i][c + j].getGreen();
+					  blue += pixels[r + i][c + j].getBlue();
+					  grids++;
+				    }
+				}
+			}
+		}
+		resultPixels[r][c].setRed(red / grids);
+		resultPixels[r][c].setGreen(green / grids);
+		resultPixels[r][c].setBlue(blue / grids);
+	}
+	return result;
+  }
+  
+  /** Method that enhances a picture by getting average Color around
+	* a pixel then applies the following formula:
+	*
+	* pixelColor <- 2 * currentValue - averageValue
+	*
+	* size is the area to sample for blur.
+	*
+	* @param size Larger means more area to average around pixel
+	* and longer compute time.
+	* @return enhanced picture
+  */
+  public Picture enhance(int size)	//////////////////////////////////// LOOK UP
   {
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
-	  
-	  for (int r = 0; r < pixels.length; r++) {
-		  for (int c = 0; c < pixels[0].length; c++) {
-			  int totalR = 0;
-			  int totalG = 0;
-			  int totalB = 0;
-			  int pixelsInGrid = 0;
-			  for (int i = -(size / 2); i < size - 1; i++) {
-				  for (int j = -(size / 2); j < size - 1; j++) {
-					  if (r + i > 0 && r + i < pixels.length &&
-							c + j > 0 && c + j < pixels[0].length) {
-							totalR += pixels[r + i][c + j].getRed();	
-							totalG += pixels[r + i][c + j].getGreen();	
-							totalB += pixels[r + i][c + j].getBlue();	
-							pixelsInGrid++;
+	  int r = 0;
+	  int c = 0;
+	  int mid = size / 2;
+	  while (r < pixels.length && c < pixels[0].length) {
+		  int red = 0;
+		  int green = 0;
+		  int blue = 0;
+		  int grids = 0;
+		  for (int i = r - mid; i <= r + mid; i++) {
+			  for (int j = c - mid; c <= r + mid; j++) {
+				  if ( i >= 0 && i < pixels.length && j >=0 && c < pixels[0].length) {
+					  if (r + i < pixels.length && c + j < pixels[0].length) {
+						  red += pixels[r + i][c + j].getRed();
+						  green += pixels[r + i][c + j].getGreen();
+						  blue += pixels[r + i][c + j].getBlue();
+						  grids++;
 					  }
 				  }
 			  }
-			  int red = totalR / pixelsInGrid;
-			  resultPixels[r][c].setRed(red);
-			  int green = totalG / pixelsInGrid;
-			  resultPixels[r][c].setGreen(green);
-			  int blue = totalB / pixelsInGrid;
-			  resultPixels[r][c].setBlue(blue);
 		  }
+		  int avgR = red / grids;
+		  int avgG = green / grids;
+		  int avgB = blue / grids;
+		  resultPixels[r][c].setRed(2 * pixels[r][c].getRed() + avgR);
+		  resultPixels[r][c].setGreen(2 * pixels[r][c].getGreen() + avgG);
+		  resultPixels[r][c].setBlue(2 * pixels[r][c].getBlue() + avgB);
 	  }
 	  return result;
+  }
+  
+  /** Method that shifts a percent of the picture to the right, and wraps
+   *  it around to the left.
+   *  @param percent	the percent of the picture that will be shifted
+   * 					and wrapped around
+   *  @return			the shifted picture
+   */
+  public Picture shiftRight(int percent) {
+	  Pixel[][] pixels = this.getPixels2D();
+	  Picture result = new Picture(pixels.length, pixels[0].length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  int shiftAmt = pixels[0].length * percent / 100;	/////////////////////////////////////////////////////
+	  }
   }
   
   /** Method that mirrors the picture around a 
