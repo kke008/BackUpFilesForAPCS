@@ -281,15 +281,157 @@ public class Picture extends SimplePicture
    * 					and wrapped around
    *  @return			the shifted picture
    */
-  public Picture shiftRight(int percent) {
+  public Picture shiftRight(int percent) {	//////////////////////////////////////  DONE BEING WRITTEN
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
-	  int shiftAmt = pixels[0].length * percent / 100;	/////////////////////////////////////////////////////
+	  int shiftAmt = pixels[0].length * percent / 100;
+	  for (int c = 0; c < pixels[0].length; c++) {
+		  int newC = c + shiftAmt;
+		  if (newC >= pixels[0].length)
+			newC = pixels[0].length - 1 - newC;
+		  for (int r = 0; r < pixels.length; r++) {
+			 resultPixelsr[r][newC] = pixels[r][c];
+		  }
 	  }
+	  return result;
   }
   
+  /** Method that shifts each row of pixels in a picture a given amount to the
+   *  right, and wraps it around to the right. This amount will increase a given
+   *  number of times so the result will be jagged.
+   *  @param shiftCount		the number of pixels to shift right at each stair step
+   *  @param steps			the number of stair steps
+   *  @return result		the altered picture
+   */
+  public Picture stairStep(int shiftCount, int steps) {		//////////////////// DONE BEING WRITTEN
+	  Pixels[][] pixels = this.getPixels2D();
+	  Picture result = new Picture(pixels.length, pixels[0].length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  int stepSize = (pixels.length - 1) / steps;
+	  int shiftAmt = 0;
+	  for(int r = 0; r < pixels.length; r++) {
+		  if (r % stepSize == 0)
+			  shiftAmt += shiftCount;
+			  
+		  for (int c = 0; c < pixels[0].length; c++) {
+			  int newC = c + shiftAmt;
+			  if (newC >= pixels[0].length)
+				newC = pixels[0].length - 1 - newC;
+				resultPixels[r][newC] = pixels[r][c];
+		  }
+	  }
+	  return result;
+  }
+  
+  /** Method that rotates a picture 90 degrees clockwise
+   *  @return result	the rotated picture
+   */
+  public Picture turn90() {		///////////////////////////////////////////// doNE BEING WRITTED
+	  Pixels[][] pixels = this.getPixels2D();
+	  Picture result = new Picture(pixels[0].length, pixels.length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  for (int r = 0; r < pixels.length; r++) {
+		  for (int c = 0; c < pixels[0].length; c++) {
+			  resultPixels[c][pixels.length - r] = pixels[r][c];
+		  }
+	  }
+	  return result;
+  }
+  
+  /** Method that zooms in on the upper left corner (25%) of the image by
+   *  replicating each pixel to make it seem larger
+   *  @return result	the zoomed in picture
+   */
+  public Picture zoomUpperLeft() {	////////////////////////////////////////// DONE BEING WRITTEN
+	  Pixels[][] pixels = this.getPixels2D();
+	  int rLength = pixels.length / 4;
+	  int rWidth = pixels[0].length / 4;
+	  Picture result = new Picture(rLength, rWidth);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  int r = 0;
+	  int c = 0;
+	  while (r < rLength) {
+		  for (int i = 0; i < 2; i++) {
+			  for (int j = 0; j < 2; j++) {
+				  resultPixels[r + i][c + j] = pixel[r][c];
+			  }
+		  }
+		  c += 2;
+		  if (c >= rWidth) {
+			  c = 0;
+			  r += 2;
+		  }
+	  }
+	  return result;
+  }
+  
+  /** Method to tile the image by reducing it to 25% of its original size, then 
+   *  mirror it horizontally and / or vertically and move it to the other three
+   *  quadrants
+   *  @return result	the tiled picture
+   */
+  public Picture tileMirror() {		////////////////////// DONE WRITING TRY SEPARATELY
+	  Pixels[][] pixels = this.getPixels2D();
+	  int rLength = pixels.length / 4 * 4;
+	  int rWidth = pixels[0].length / 4 * 4;
+	  Picture result = new Picture(rWidth, rLength);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  int midL = rLength / 2;
+	  int midW = rWidth / 2;
+	  
+	  // reduce image by finding average of every 4 pixels and making it 1
+	  int r = 0;
+	  int c = 0;
+	  while (r < midL) {
+		  int red = 0;
+		  int green = 0;
+		  int blue = 0;
+		  for (int i = 2*r; i < 2*r + 2; i++) {
+			  for (int j = 2*c; j < 2*c + 2; j++) {
+				  red += pixels[i][j].getRed();
+				  green += pixels[i][j].getGreen();
+				  blue += pixels[i][j].getBlue();
+			  }
+		  }
+		  resultPixels[r][c].setRed(red / 4);
+		  resultPixels[r][c].setGreen(green / 4);
+		  resultPixels[r][c].setBlue(blue / 4);
+		  
+		  c++;
+		  if (c >= midW) {
+			  c = 0;
+			  r++;
+		  }
+	  }
+	  
+	  // mirroring into quadrant I
+	  for (int r1 = 0; r1 < midL; r1++) {
+		  for (int c1 = midW; c1 < rWidth; c1++) {
+			  resultPixels[r1][c1] = resultPixels[r1][2*midW - c1 - 1];
+		  }
+	  }
+	  
+	  // mirroring into quadrant III
+	  for (int r3 = midL; r3 < rlength; r3++) {
+		  for (int c3 = 0; c3 < midW; c3++) {
+			  resultPixels[r3][c3] = resultPixels[2*midL - r3 - 1][c3];
+		  }
+	  }
+	  
+	  // mirroring into quadrant IV
+	  for (int r4 = 0; r4 < midL; r4++) {
+		  for (int c4 = 0; c4 < midW; c4++) {
+			  resultPixels[r4][c4] = resultPixels[midL - r4 - 1][midW - c4 - 1]
+		  }
+	  }
+  }
+   
   /** Method that mirrors the picture around a 
     * vertical mirror in the center of the picture
     * from left to right */
