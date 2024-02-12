@@ -281,18 +281,21 @@ public class Picture extends SimplePicture
    * 					and wrapped around
    *  @return			the shifted picture
    */
-  public Picture shiftRight(int percent) {	//////////////////////////////////////  DONE BEING WRITTEN
+  public Picture shiftRight(int percent) {
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
 	  int shiftAmt = pixels[0].length * percent / 100;
-	  for (int c = 0; c < pixels[0].length; c++) {
-		  int newC = c + shiftAmt;
-		  if (newC >= pixels[0].length)
-			newC = pixels[0].length - 1 - newC;
-		  for (int r = 0; r < pixels.length; r++) {
-			 resultPixelsr[r][newC] = pixels[r][c];
+	  for (int r = 0; r < pixels.length; r++) {
+		  for (int c = 0; c < pixels[0].length; c++) {
+			  int newC = c + shiftAmt;
+			  if (newC >= pixels[0].length)
+				  newC = newC - pixels[0].length;
+			  
+			  resultPixels[r][newC].setRed(pixels[r][c].getRed());
+			  resultPixels[r][newC].setGreen(pixels[r][c].getGreen());
+			  resultPixels[r][newC].setBlue(pixels[r][c].getBlue());
 		  }
 	  }
 	  return result;
@@ -305,8 +308,8 @@ public class Picture extends SimplePicture
    *  @param steps			the number of stair steps
    *  @return result		the altered picture
    */
-  public Picture stairStep(int shiftCount, int steps) {		//////////////////// DONE BEING WRITTEN
-	  Pixels[][] pixels = this.getPixels2D();
+  public Picture stairStep(int shiftCount, int steps) {
+	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
@@ -319,8 +322,11 @@ public class Picture extends SimplePicture
 		  for (int c = 0; c < pixels[0].length; c++) {
 			  int newC = c + shiftAmt;
 			  if (newC >= pixels[0].length)
-				newC = pixels[0].length - 1 - newC;
-				resultPixels[r][newC] = pixels[r][c];
+				  newC = newC - pixels[0].length;
+			  
+			  resultPixels[r][newC].setRed(pixels[r][c].getRed());
+			  resultPixels[r][newC].setGreen(pixels[r][c].getGreen());
+			  resultPixels[r][newC].setBlue(pixels[r][c].getBlue());
 		  }
 	  }
 	  return result;
@@ -329,16 +335,26 @@ public class Picture extends SimplePicture
   /** Method that rotates a picture 90 degrees clockwise
    *  @return result	the rotated picture
    */
-  public Picture turn90() {		///////////////////////////////////////////// doNE BEING WRITTED
-	  Pixels[][] pixels = this.getPixels2D();
+  public Picture turn90() {	/////////////////////////// TURNS IN WRONG DIRECTION
+	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels[0].length, pixels.length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
-	  for (int r = 0; r < pixels.length; r++) {
+	  for (int r = 0; r < resultPixels.length; r++) {
+		  for (int c = 0; c < resultPixels[0].length; c++) {
+			  int newC = pixels[0].length - 1 - r;
+			  resultPixels[r][c].setRed(pixels[c][newC].getRed());
+			  resultPixels[r][c].setGreen(pixels[c][newC].getGreen());
+			  resultPixels[r][c].setBlue(pixels[c][newC].getBlue());
+		  }
+	  }
+	  
+	  /*for (int r = 0; r < pixels.length; r++) {
 		  for (int c = 0; c < pixels[0].length; c++) {
 			  resultPixels[c][pixels.length - r] = pixels[r][c];
 		  }
 	  }
+	  */
 	  return result;
   }
   
@@ -347,7 +363,7 @@ public class Picture extends SimplePicture
    *  @return result	the zoomed in picture
    */
   public Picture zoomUpperLeft() {	////////////////////////////////////////// DONE BEING WRITTEN
-	  Pixels[][] pixels = this.getPixels2D();
+	  Pixel[][] pixels = this.getPixels2D();
 	  int rLength = pixels.length / 4;
 	  int rWidth = pixels[0].length / 4;
 	  Picture result = new Picture(rLength, rWidth);
@@ -358,7 +374,7 @@ public class Picture extends SimplePicture
 	  while (r < rLength) {
 		  for (int i = 0; i < 2; i++) {
 			  for (int j = 0; j < 2; j++) {
-				  resultPixels[r + i][c + j] = pixel[r][c];
+				  resultPixels[r + i][c + j] = pixels[r][c];
 			  }
 		  }
 		  c += 2;
@@ -376,7 +392,7 @@ public class Picture extends SimplePicture
    *  @return result	the tiled picture
    */
   public Picture tileMirror() {		////////////////////// DONE WRITING TRY SEPARATELY
-	  Pixels[][] pixels = this.getPixels2D();
+	  Pixel[][] pixels = this.getPixels2D();
 	  int rLength = pixels.length / 4 * 4;
 	  int rWidth = pixels[0].length / 4 * 4;
 	  Picture result = new Picture(rWidth, rLength);
@@ -418,7 +434,7 @@ public class Picture extends SimplePicture
 	  }
 	  
 	  // mirroring into quadrant III
-	  for (int r3 = midL; r3 < rlength; r3++) {
+	  for (int r3 = midL; r3 < rLength; r3++) {
 		  for (int c3 = 0; c3 < midW; c3++) {
 			  resultPixels[r3][c3] = resultPixels[2*midL - r3 - 1][c3];
 		  }
@@ -427,9 +443,11 @@ public class Picture extends SimplePicture
 	  // mirroring into quadrant IV
 	  for (int r4 = 0; r4 < midL; r4++) {
 		  for (int c4 = 0; c4 < midW; c4++) {
-			  resultPixels[r4][c4] = resultPixels[midL - r4 - 1][midW - c4 - 1]
+			  resultPixels[r4][c4] = resultPixels[midL - r4 - 1][midW - c4 - 1];
 		  }
 	  }
+	  
+	  return result;
   }
    
   /** Method that mirrors the picture around a 
