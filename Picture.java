@@ -403,7 +403,7 @@ public class Picture extends SimplePicture
    *  quadrants
    *  @return result	the tiled picture
    */
-  public Picture tileMirror() {		////////////////////// DONE WRITING TRY SEPARATELY
+  public Picture tileMirror() {		////////////////////// MIRROR INTO Q4 DOESN"T WORK
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
@@ -439,24 +439,41 @@ public class Picture extends SimplePicture
 	  // mirroring into quadrant I
 	  for (int r1 = 0; r1 < midL; r1++) {
 		  for (int c1 = midW; c1 < pixels[0].length; c1++) {
-			  resultPixels[r1][2*midW - c1 - 1] = resultPixels[r1][c1];
+			  int red = resultPixels[r1][2*midW - c1 - 1].getRed();
+			  int green = resultPixels[r1][2*midW - c1 - 1].getGreen();
+			  int blue = resultPixels[r1][2*midW - c1 - 1].getBlue();
+
+			  resultPixels[r1][c1].setRed(red);
+			  resultPixels[r1][c1].setGreen(green);
+			  resultPixels[r1][c1].setBlue(blue);
 		  }
 	  }
 	  
 	  // mirroring into quadrant III
-	  /*for (int r3 = midL; r3 < pixels.length; r3++) {
+	  for (int r3 = midL; r3 < pixels.length; r3++) {
 		  for (int c3 = 0; c3 < midW; c3++) {
-			  resultPixels[r3][c3] = resultPixels[2*midL - r3 - 1][c3];
+			  int red = resultPixels[2*midL - r3 - 1][c3].getRed();
+			  int green = resultPixels[2*midL - r3 - 1][c3].getGreen();
+			  int blue = resultPixels[2*midL - r3 - 1][c3].getBlue();
+			  
+			  resultPixels[r3][c3].setRed(red);
+			  resultPixels[r3][c3].setGreen(green);
+			  resultPixels[r3][c3].setBlue(blue);
 		  }
 	  }
 	  
 	  // mirroring into quadrant IV
 	  for (int r4 = 0; r4 < midL; r4++) {
 		  for (int c4 = 0; c4 < midW; c4++) {
-			  resultPixels[r4][c4] = resultPixels[midL - r4 - 1][midW - c4 - 1];
+			  int red = resultPixels[midL - r4 - 1][midW - c4 - 1].getRed();
+			  int green = resultPixels[midL - r4 - 1][midW - c4 - 1].getGreen();
+			  int blue = resultPixels[midL - r4 - 1][midW - c4 - 1].getBlue();
+			  
+			  resultPixels[r4][c4].setRed(red);
+			  resultPixels[r4][c4].setGreen(green);
+			  resultPixels[r4][c4].setBlue(blue);
 		  }
 	  }
-	  */
 	  
 	  return result;
   }
