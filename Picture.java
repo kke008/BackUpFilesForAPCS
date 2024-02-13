@@ -335,26 +335,19 @@ public class Picture extends SimplePicture
   /** Method that rotates a picture 90 degrees clockwise
    *  @return result	the rotated picture
    */
-  public Picture turn90() {	/////////////////////////// TURNS IN WRONG DIRECTION
+  public Picture turn90() {
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels[0].length, pixels.length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
-	  for (int r = 0; r < resultPixels.length; r++) {
-		  for (int c = 0; c < resultPixels[0].length; c++) {
-			  int newC = pixels[0].length - 1 - r;
-			  resultPixels[r][c].setRed(pixels[c][newC].getRed());
-			  resultPixels[r][c].setGreen(pixels[c][newC].getGreen());
-			  resultPixels[r][c].setBlue(pixels[c][newC].getBlue());
-		  }
-	  }
-	  
-	  /*for (int r = 0; r < pixels.length; r++) {
+	  for (int r = 0; r < pixels.length; r++) {
 		  for (int c = 0; c < pixels[0].length; c++) {
-			  resultPixels[c][pixels.length - r] = pixels[r][c];
+			  int newC = pixels.length - 1 - r;
+			  resultPixels[c][newC].setRed(pixels[r][c].getRed());
+			  resultPixels[c][newC].setGreen(pixels[r][c].getGreen());
+			  resultPixels[c][newC].setBlue(pixels[r][c].getBlue());
 		  }
 	  }
-	  */
 	  return result;
   }
   
@@ -362,25 +355,44 @@ public class Picture extends SimplePicture
    *  replicating each pixel to make it seem larger
    *  @return result	the zoomed in picture
    */
-  public Picture zoomUpperLeft() {	////////////////////////////////////////// DONE BEING WRITTEN
+  public Picture zoomUpperLeft() {
 	  Pixel[][] pixels = this.getPixels2D();
-	  int rLength = pixels.length / 4;
-	  int rWidth = pixels[0].length / 4;
-	  Picture result = new Picture(rLength, rWidth);
+	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
-	  int r = 0;
-	  int c = 0;
-	  while (r < rLength) {
+	  int r = 0;	// current row in og pic
+	  int c = 0;	// current column in og pic
+	  int rMax = pixels.length / 2 - 1;		// half the rows
+	  int cMax = pixels[0].length / 2 - 1;	// half the columns
+	  int rowInd = 0;	// used to go through rows of new pic
+	  int colInd = 0;	// used to go through columns of new pic
+	  
+	  while (r <= rMax) {
+		  int red = pixels[r][c].getRed();
+		  int green = pixels[r][c].getGreen();
+		  int blue = pixels[r][c].getBlue();
+		  
 		  for (int i = 0; i < 2; i++) {
 			  for (int j = 0; j < 2; j++) {
-				  resultPixels[r + i][c + j] = pixels[r][c];
+				  if (rowInd + i < resultPixels.length && 
+								colInd + j < resultPixels[0].length) {
+					  resultPixels[rowInd + i][colInd + j].setRed(red);
+					  resultPixels[rowInd + i][colInd + j].setGreen(green);
+					  resultPixels[rowInd + i][colInd + j].setBlue(blue);
+				  }
 			  }
 		  }
-		  c += 2;
-		  if (c >= rWidth) {
+		  
+		  colInd += 2;
+		  if (colInd >= resultPixels[0].length) {
+			  colInd = 0;
+			  rowInd += 2;
+		  }
+		  
+		  c++;
+		  if (c > cMax) {
 			  c = 0;
-			  r += 2;
+			  r++;
 		  }
 	  }
 	  return result;
@@ -393,13 +405,11 @@ public class Picture extends SimplePicture
    */
   public Picture tileMirror() {		////////////////////// DONE WRITING TRY SEPARATELY
 	  Pixel[][] pixels = this.getPixels2D();
-	  int rLength = pixels.length / 4 * 4;
-	  int rWidth = pixels[0].length / 4 * 4;
-	  Picture result = new Picture(rWidth, rLength);
+	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
 	  
-	  int midL = rLength / 2;
-	  int midW = rWidth / 2;
+	  int midL = pixels.length / 2;
+	  int midW = pixels[0].length / 2;
 	  
 	  // reduce image by finding average of every 4 pixels and making it 1
 	  int r = 0;
@@ -428,13 +438,13 @@ public class Picture extends SimplePicture
 	  
 	  // mirroring into quadrant I
 	  for (int r1 = 0; r1 < midL; r1++) {
-		  for (int c1 = midW; c1 < rWidth; c1++) {
-			  resultPixels[r1][c1] = resultPixels[r1][2*midW - c1 - 1];
+		  for (int c1 = midW; c1 < pixels[0].length; c1++) {
+			  resultPixels[r1][2*midW - c1 - 1] = resultPixels[r1][c1];
 		  }
 	  }
 	  
 	  // mirroring into quadrant III
-	  for (int r3 = midL; r3 < rLength; r3++) {
+	  /*for (int r3 = midL; r3 < pixels.length; r3++) {
 		  for (int c3 = 0; c3 < midW; c3++) {
 			  resultPixels[r3][c3] = resultPixels[2*midL - r3 - 1][c3];
 		  }
@@ -446,6 +456,7 @@ public class Picture extends SimplePicture
 			  resultPixels[r4][c4] = resultPixels[midL - r4 - 1][midW - c4 - 1];
 		  }
 	  }
+	  */
 	  
 	  return result;
   }
