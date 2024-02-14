@@ -403,7 +403,7 @@ public class Picture extends SimplePicture
    *  quadrants
    *  @return result	the tiled picture
    */
-  public Picture tileMirror() {		////////////////////// MIRROR INTO Q4 DOESN"T WORK
+  public Picture tileMirror() {		////////////////////// MIRROR INTO Q4 SHOULD WORK
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
@@ -465,13 +465,12 @@ public class Picture extends SimplePicture
 	  // mirroring into quadrant IV
 	  for (int r4 = 0; r4 < midL; r4++) {
 		  for (int c4 = 0; c4 < midW; c4++) {
-			  int red = resultPixels[midL - r4 - 1][midW - c4 - 1].getRed();
-			  int green = resultPixels[midL - r4 - 1][midW - c4 - 1].getGreen();
-			  int blue = resultPixels[midL - r4 - 1][midW - c4 - 1].getBlue();
+			  int row = resultPixels.length - 1 - r4;
+			  int col = resultPixels[0].length - 1 - c4;
 			  
-			  resultPixels[r4][c4].setRed(red);
-			  resultPixels[r4][c4].setGreen(green);
-			  resultPixels[r4][c4].setBlue(blue);
+			  resultPixels[row][col].setRed(resultPixels[r4][c4].getRed());
+			  resultPixels[row][col].setGreen(resultPixels[r4][c4].getGreen());
+			  resultPixels[row][col].setBlue(resultPixels[r4][c4].getBlue());
 		  }
 	  }
 	  
