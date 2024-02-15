@@ -11,7 +11,8 @@ import java.util.List; // resolves problem with java.awt.List and java.util.List
  * SimplePicture and allows the student to add functionality to
  * the Picture class.  
  * 
- * @author Barbara Ericson ericson@cc.gatech.edu
+ * @author Barbara Ericson ericson@cc.gatech.edu and Karen Ke
+ * @since February 5, 2024
  */
 public class Picture extends SimplePicture 
 {
@@ -172,7 +173,6 @@ public class Picture extends SimplePicture
 				  }
 			  }
 		  }
-		  
 		  for (int a = 0; a < size; a++) {
 			  for (int b = 0; b < size; b++) {
 				  if (r + a < pixels.length && c + b < pixels[0].length) {
@@ -196,35 +196,33 @@ public class Picture extends SimplePicture
 	* @param size Blur size, greater is more blur
 	* @return Blurred picture
   */
-  public Picture blur(int size)	//////////////////////////////////////// NO IDEA IF THIS WORKS
+  public Picture blur(int size)
   {
 	Pixel[][] pixels = this.getPixels2D();
 	Picture result = new Picture(pixels.length, pixels[0].length);
 	Pixel[][] resultPixels = result.getPixels2D();
-	
-	int r = 0;
-	int c = 0;
 	int mid = size / 2;
-	while (r < pixels.length && c < pixels[0].length) {
-		int red = 0;
-		int green = 0;
-		int blue = 0;
-		int grids = 0;
-		for (int i = r - mid; i <= r + mid; i++) {
-			for (int j = c - mid; c <= r + mid; j++) {
-				if ( i >= 0 && i < pixels.length && j >=0 && c < pixels[0].length) {
-					if (r + i < pixels.length && c + j < pixels[0].length) {
-					  red += pixels[r + i][c + j].getRed();
-					  green += pixels[r + i][c + j].getGreen();
-					  blue += pixels[r + i][c + j].getBlue();
-					  grids++;
-				    }
+	for (int r = 0; r < pixels.length; r++) {
+		for (int c = 0; c < pixels[0].length; c++) {
+			int red = 0;
+			int green = 0;
+			int blue = 0;
+			int grids = 0;
+			for (int i = r - mid; i <= r + mid; i++) {
+				for (int j = c - mid; j <= c + mid; j++) {
+					if (i >= 0 && i < pixels.length && j >= 0 && 
+											j < pixels[0].length) {
+						red += pixels[i][j].getRed();
+						green += pixels[i][j].getGreen();
+						blue += pixels[i][j].getBlue();
+						grids++;
+					}
 				}
 			}
+			resultPixels[r][c].setRed(red / grids);
+			resultPixels[r][c].setGreen(green / grids);
+			resultPixels[r][c].setBlue(blue / grids);
 		}
-		resultPixels[r][c].setRed(red / grids);
-		resultPixels[r][c].setGreen(green / grids);
-		resultPixels[r][c].setBlue(blue / grids);
 	}
 	return result;
   }
@@ -240,37 +238,35 @@ public class Picture extends SimplePicture
 	* and longer compute time.
 	* @return enhanced picture
   */
-  public Picture enhance(int size)	//////////////////////////////////// LOOK UP
+  public Picture enhance(int size)
   {
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
-	  int r = 0;
-	  int c = 0;
 	  int mid = size / 2;
-	  while (r < pixels.length && c < pixels[0].length) {
-		  int red = 0;
-		  int green = 0;
-		  int blue = 0;
-		  int grids = 0;
-		  for (int i = r - mid; i <= r + mid; i++) {
-			  for (int j = c - mid; c <= r + mid; j++) {
-				  if ( i >= 0 && i < pixels.length && j >=0 && c < pixels[0].length) {
-					  if (r + i < pixels.length && c + j < pixels[0].length) {
-						  red += pixels[r + i][c + j].getRed();
-						  green += pixels[r + i][c + j].getGreen();
-						  blue += pixels[r + i][c + j].getBlue();
+	  for (int r = 0; r < pixels.length; r++) {
+		  for (int c = 0; c < pixels[0].length; c++) {
+			  int red = 0;
+			  int green = 0;
+			  int blue = 0;
+			  int grids = 0;
+			  for (int i = r - mid; i <= r + mid; i++) {
+				  for (int j = c - mid; j <= c + mid; j++) {
+					  if ( i >= 0 && i < pixels.length && j >=0 && j < pixels[0].length) {
+						  red += pixels[i][j].getRed();
+						  green += pixels[i][j].getGreen();
+						  blue += pixels[i][j].getBlue();
 						  grids++;
 					  }
 				  }
 			  }
+			  int avgR = red / grids;
+			  int avgG = green / grids;
+			  int avgB = blue / grids;
+			  resultPixels[r][c].setRed(2 * pixels[r][c].getRed() - avgR);
+			  resultPixels[r][c].setGreen(2 * pixels[r][c].getGreen() - avgG);
+			  resultPixels[r][c].setBlue(2 * pixels[r][c].getBlue() - avgB);
 		  }
-		  int avgR = red / grids;
-		  int avgG = green / grids;
-		  int avgB = blue / grids;
-		  resultPixels[r][c].setRed(2 * pixels[r][c].getRed() + avgR);
-		  resultPixels[r][c].setGreen(2 * pixels[r][c].getGreen() + avgG);
-		  resultPixels[r][c].setBlue(2 * pixels[r][c].getBlue() + avgB);
 	  }
 	  return result;
   }
@@ -388,7 +384,6 @@ public class Picture extends SimplePicture
 			  colInd = 0;
 			  rowInd += 2;
 		  }
-		  
 		  c++;
 		  if (c > cMax) {
 			  c = 0;
@@ -403,7 +398,7 @@ public class Picture extends SimplePicture
    *  quadrants
    *  @return result	the tiled picture
    */
-  public Picture tileMirror() {		////////////////////// MIRROR INTO Q4 SHOULD WORK
+  public Picture tileMirror() {	
 	  Pixel[][] pixels = this.getPixels2D();
 	  Picture result = new Picture(pixels.length, pixels[0].length);
 	  Pixel[][] resultPixels = result.getPixels2D();
@@ -473,7 +468,6 @@ public class Picture extends SimplePicture
 			  resultPixels[row][col].setBlue(resultPixels[r4][c4].getBlue());
 		  }
 	  }
-	  
 	  return result;
   }
    
