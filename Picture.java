@@ -590,6 +590,51 @@ public class Picture extends SimplePicture
     }
   }
   
+  /** Method that prints an edge picture of the picture using edge detection
+   *  and comparing the color of each pixel to the one below it. If the
+   *  difference between the values exceeds the threshold, the pixel is
+   *  turned black. Otherwise, it is turned white. The difference is 
+   *  calculated using the colorDistance method in Pixel.
+   *  @param threshold		the threshold value
+   *  @return 				the edge picture
+   */
+  public Picture edgeDetectionBelow(int threshold) {
+	  Pixel[][] pixels = this.getPixels2D();
+	  Picture result = new Picture(pixels.length, pixels[0].length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  for (int r = 0; r < pixels.length; r++) {
+		  for (int c = 0; c < pixels[0].length - 1; c++) {
+			  Pixel pix = pixels[r][c];
+			  Pixel below = pixels[r][c + 1];
+			  Color color = below.getColor();
+			  if (pix.colorDistance(color) <= threshold)
+				  resultPixels[r][c].setColor(Color.WHITE);
+			  else
+				  resultPixels[r][c].setColor(Color.BLACK);
+		  }
+	  }
+	  return result;
+  }
+  
+  /** Method that takes two images of subjects on a greenscreen and
+   *  superimposes them onto a third image of a background so that the
+   *  scene looks natural.
+   *  @return		the composite picture
+   */
+  public void greenScreen() {
+	  Picture cat = new Picture ("GreenScreenCatMouse/kitten2GreenScreen.jpg");
+	  Pixel[][] catPix = cat.getPixels2D();
+	  Picture mouse = new Picture ("GreenScreenCatMouse/mouse1GreenScreen.jpg");
+	  Pixel[][] mousePix = mouse.getPixels2D();
+	  Picture bkg = new Picture("GreenScreenCatMouse/IndoorHouseLibraryBackground.jpg");
+	  Pixel[][] bkgPix = bkg.getPixels2D();
+	  Picture result = new Picture(bkgPix.length, bkgPix[0].length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  int threshold = 10;
+  }
+  
   
   /* Main method for testing - each class in Java can have a main 
    * method 
