@@ -589,7 +589,104 @@ public class Picture extends SimplePicture
       }
     }
   }
+
+ ////////////////////////////////////////////////////////////////// ADD EDGE DETECTION BELOW HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
+  /** Method to superimpose two images of subjects with a green background on to 
+   *  a picture of a background, and move and size them to look natural.
+   */
+  public Picture greenScreen() {
+	  Picture cat = new Picture("kitten1GreenScreen.jpg");
+	  Pixel[][] catPix = cat.getPixels2D();
+	  Picture mouse = new Picture("mouse1GreenScreen.jpg");
+	  Pixel[][] mousePix = mouse.getPixels2D();
+	  Picture bkg = new Picture("IndoorHouseLibraryBackground.jpg");
+	  Pixel[][] bkgPix = bkg.getPixels2D();
+	  Picture result = new Picture(bkg);
+	  Pixel[][] resultPix = result.getPixels2D();
+	  
+	  Color green = catPix[0][0].getColor();
+	  int threshold = 100;
+	  
+	  // resizing cat (into 149 x 149)
+	  Picture newCat = new Picture(catPix.length / 2, catPix[0].length / 2);
+	  Pixel[][] newCatPix = newCat.getPixels2D();
+	  int catR = 0;
+	  int catC = 0;
+	  while (catR < newCatPix.length) {
+		  int redC = 0;
+		  int greenC = 0;
+		  int blueC = 0;
+		  int pixels = 0;
+		  for (int i = 2*catR; i < 2*catR + 2; i++) {
+			  for (int j = 2*catC; j < 2*catC + 2; j++) {
+				  if (i < catPix.length && j < catPix[0].length) {
+					  redC += catPix[i][j].getRed();
+					  greenC += catPix[i][j].getGreen();
+					  blueC += catPix[i][j].getBlue();
+					  pixels++;
+				  }
+			  }
+		  }
+		  newCatPix[catR][catC].setRed(redC / pixels);
+		  newCatPix[catR][catC].setGreen(greenC / pixels);
+		  newCatPix[catR][catC].setBlue(blueC / pixels);
+		  
+		  catC++;
+		  if (catC >= newCatPix[0].length) {
+			  catR++;
+			  catC = 0;
+		  }
+	  }
+	  
+	  // adding cat
+	  for (int a = 0; a < newCatPix.length; a++) {
+		  for (int b = 0; b < newCatPix[0].length; b++) {
+			  if (newCatPix[a][b].colorDistance(green) > threshold)
+				resultPix[a + 375][b + 520].setColor(newCatPix[a][b].getColor());
+		  }
+	  }
+	  
+	  // resizing mouse (into 74 x 124)
+	  Picture newMouse = new Picture(mousePix.length / 2, mousePix[0].length / 2);
+	  Pixel[][] newMousePix = newMouse.getPixels2D();
+	  int mouseR = 0;
+	  int mouseC = 0;
+	  while (mouseR < newMousePix.length) {
+		  int redM = 0;
+		  int greenM = 0;
+		  int blueM = 0;
+		  int pixels = 0;
+		  for (int i = 2*mouseR; i < 2*mouseR + 2; i++) {
+			  for (int j = 2*mouseC; j < 2*mouseC + 2; j++) {
+				  if (i < mousePix.length && j < mousePix[0].length) {
+					  redM += mousePix[i][j].getRed();
+					  greenM += mousePix[i][j].getGreen();
+					  blueM += mousePix[i][j].getBlue();
+					  pixels++;
+				  }
+			  }
+		  }
+		  newMousePix[mouseR][mouseC].setRed(redM / pixels);
+		  newMousePix[mouseR][mouseC].setGreen(greenM / pixels);
+		  newMousePix[mouseR][mouseC].setBlue(blueM / pixels);
+		  
+		  mouseC++;
+		  if (mouseC >= newMousePix[0].length) {
+			  mouseR++;
+			  mouseC = 0;
+		  }
+	  }
+	  
+	  // adding mouse
+	  for (int c = 0; c < newMousePix.length; c++) {
+		  for (int d = 0; d < newMousePix[0].length; d++) {
+			  if (newMousePix[c][d].colorDistance(green) > threshold)
+				resultPix[c + 350][d + 300].setColor(newMousePix[c][d].getColor());
+		  }
+	  }
+	  return result;
+  }
   
   /* Main method for testing - each class in Java can have a main 
    * method 
