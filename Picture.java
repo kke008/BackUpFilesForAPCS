@@ -591,6 +591,32 @@ public class Picture extends SimplePicture
   }
 
  ////////////////////////////////////////////////////////////////// ADD EDGE DETECTION BELOW HERE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	  /** Method that prints an edge picture of the picture using edge detection
+   *  and comparing the color of each pixel to the one below it. If the
+   *  difference between the values exceeds the threshold, the pixel is
+   *  turned black. Otherwise, it is turned white. The difference is 
+   *  calculated using the colorDistance method in Pixel.
+   *  @param threshold		the threshold value
+   *  @return 				the edge picture
+   */
+  public Picture edgeDetectionBelow(int threshold) {
+	  Pixel[][] pixels = this.getPixels2D();
+	  Picture result = new Picture(pixels.length, pixels[0].length);
+	  Pixel[][] resultPixels = result.getPixels2D();
+	  
+	  for (int r = 0; r < pixels.length; r++) {
+		  for (int c = 0; c < pixels[0].length - 1; c++) {
+			  Pixel pix = pixels[r][c];
+			  Pixel below = pixels[r][c + 1];
+			  Color color = below.getColor();
+			  if (pix.colorDistance(color) <= threshold)
+				  resultPixels[r][c].setColor(Color.WHITE);
+			  else
+				  resultPixels[r][c].setColor(Color.BLACK);
+		  }
+	  }
+	  return result;
+  }
   
   /** Method to superimpose two images of subjects with a green background on to 
    *  a picture of a background, and move and size them to look natural.
