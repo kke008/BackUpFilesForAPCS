@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;		// used by expression evaluator
 
 /**
@@ -7,6 +8,17 @@ import java.util.List;		// used by expression evaluator
  *	@author	Karen Ke
  *	@since	February 27, 2024
  */
+ ////////////////////////////////////////////////////////////////////////////////////////////
+ /*
+  *  - 5 * 6 + 1: resutls in 30 and 1 in valueStack
+  *  - empty when it shouldn't be
+  * 	- 5 + 6 + 1: op stack empty, top of val stack is 1
+  *  - need to deal with having excess operators
+  *  - chains don't work 
+  * 	- ex. addition followed by subtraction, only does adds;
+  * 		  multiplicaiton followed by division, only multiplies
+  *  	- ex. x operation y ^ z gives x ^ y ^ z
+  */
 public class SimpleCalc {
 	
 	private ExprUtils utils;	// expression utilities
@@ -38,7 +50,7 @@ public class SimpleCalc {
 	 */
 	public void runCalc() {
 		Prompt prompt = new Prompt();
-		String expression = prompt.getString("");
+		String expression = prompt.getString("\n");
 		while (expression.equals("q") == false) {
 			if (expression.length() == 0)
 				System.out.println("Please enter an expression or enter" +
@@ -53,8 +65,6 @@ public class SimpleCalc {
 			}
 			expression = prompt.getString("");
 		}
-
-		
 	}
 	
 	/**	Print help */
@@ -76,34 +86,49 @@ public class SimpleCalc {
 		double value = 0;
 		
 		int a = 0;
-		while (a < tokens.size()) {
+		while (a < tokens.size()) {		// looking at all the tokens
 			String token = tokens.get(a);
+			// if tokens are operators
 			if (token.equals("+") || token.equals("-") || token.equals("*") || 
-				token.equals("/") || token.equals("%") || token.equals("^") {
+				token.equals("/") || token.equals("%") || token.equals("^")) {
 				
-				String op1 = tokens.get(a);
-				String op2 = operatorStack.peek();
-				if (hasPrecedence(op1, op2)) {
-					operatorStack.pop();
-					double val2 = valueStack.pop();
-					double val1 = valueStack.pop();
-					if (op2.equals("+"))
-						value = val1 + val2;
-					else if (op2.equals("-"))
-						value = val1 - val2;
-					else if (op2.equals("-"))
-						value = val1 - val2;
-						else if (op2.equals("-"))
-						value = val1 - val2;
+				if (operatorStack.isEmpty())	// if token is first operator
+					operatorStack.push(token);
+				
+				else {
+					String prevOp = operatorStack.peek();
+					if (hasPrecedence(token, prevOp)) {	// if prevOp has precedence
+						operatorStack.pop();	// poping prevOp
+						double val2 = valueStack.pop();
+						double val1 = valueStack.pop();
+						if (prevOp.equals("+"))		// doing operation
+							valueStack.push(val1 + val2);
+						else if (prevOp.equals("-"))
+							valueStack.push(val1 - val2);
+						else if (prevOp.equals("/"))
+							valueStack.push(val1 / val2);
+						else if (prevOp.equals("*"))
+							valueStack.push(val1 * val2);
+						else if (prevOp.equals("%"))
+							valueStack.push(val1 % val2);
+						else
+							valueStack.push(Math.pow(val1, val2));
+					}
+					
+					// if token has precedence, add it to the stack
+					else
+						operatorStack.push(token);
 				}
 			}
 			
+			// if token is "(", evaluate expression until ")"
 			else if (token.equals("(")) {
-				List<String> inParen = new List<String>();
-				String t = "";
-				while(t.equals(")") == false) {
+				List<String> inParen = new ArrayList<String>();
+				// add tokens in between () to list
+				a++;
+				while(tokens.get(a).equals(")") == false) {
+					inParen.add(tokens.get(a));
 					a++;
-					inParen.add(tokens.get(a);
 				}
 				
 				SimpleCalc newCalc = new SimpleCalc();
@@ -111,13 +136,36 @@ public class SimpleCalc {
 				valueStack.push(ans);
 			}
 			
+			// if token is a operand, add it to stack
 			else
 				valueStack.push(Double.parseDouble(token));
-			
 			a++;
 		}
 		
-		return value;
+		if (operatorStack.isEmpty())	///////////////////////////////////////////////////
+			System.out.println("EMPTY");
+		
+		// if there are operations left to do
+		while (!operatorStack.isEmpty()) {
+			String op = operatorStack.pop();
+			double val2 = valueStack.pop();
+			double val1 = valueStack.pop();
+			// if operator is exponent, right-associative
+			if (op.equals("^"))
+				valueStack.push(Math.pow(val2, val1));
+			else if (op.equals("+"))		// doing operation
+				valueStack.push(val1 + val2);
+			else if (op.equals("-"))
+				valueStack.push(val1 - val2);
+			else if (op.equals("/"))
+				valueStack.push(val1 / val2);
+			else if (op.equals("*"))
+				valueStack.push(val1 * val2);
+			else if (op.equals("%"))
+				valueStack.push(val1 % val2);
+		}
+	
+		return valueStack.pop();
 	}
 	
 	/**
