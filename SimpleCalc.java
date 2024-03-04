@@ -11,6 +11,7 @@ import java.util.List;		// used by expression evaluator
  ////////////////////////////////////////////////////////////////////////////////////////////
  /*
   *  - (28 * 28 - 4 / (5 + 3) * 6.5) + 3.4 gives indexOutOfBounds
+  *  - GO TO LINE 103
   */
 public class SimpleCalc {
 	
@@ -77,15 +78,19 @@ public class SimpleCalc {
 	 */
 	public double evaluateExpression(List<String> tokens) {
 		double value = 0;
+		int openParenIndex = 0;
 		
 		int a = 0;
 		while (a < tokens.size()) {		// looking at all the tokens
 			String token = tokens.get(a);
 			// if tokens are operators
 			if (token.equals("+") || token.equals("-") || token.equals("*") || 
-				token.equals("/") || token.equals("%") || token.equals("^")) {
+				token.equals("/") || token.equals("%") || token.equals("^") ||
+				token.equals("(") ||token.equals(")")) {
+					
+				System.out.println("operator:\t" + token);	////////////////////////////////////////
 				
-				if (operatorStack.isEmpty())	// if token is first operator
+				if (operatorStack.isEmpty() || token.equals("("))	// if token is first operator
 					operatorStack.push(token);
 				
 				else {
@@ -95,29 +100,37 @@ public class SimpleCalc {
 						operatorStack.push(token);
 					}
 					// if token has precedence, add it to the stack
-					else
-						operatorStack.push(token);
+					else {
+						// need to evaluate all of prev expression	/////////////////////////////////////////////////////
+					}
 				}
 			}
 			
 			// if token is "(", evaluate expression until ")"
-			else if (token.equals("(")) {
+			/*else if (token.equals("(")) {
 				List<String> inParen = new ArrayList<String>();
 				// add tokens in between () to list
-				a++;
-				while(tokens.get(a).equals(")") == false) {
+				a++;	// deals with "("
+				System.out.println(tokens.size());	///////////////////////////////////
+				while(a < tokens.size() && tokens.get(a).equals(")") == false) {	////////////////////////////////////////
+					System.out.println(tokens.get(a));	////////////////////////////////////
 					inParen.add(tokens.get(a));
 					a++;
 				}
+				System.out.println("Should be ):\t" + tokens.get(a));
+				a++;	// deals with ")"
 				
 				SimpleCalc newCalc = new SimpleCalc();
-				double ans = newCalc.evaluateExpression(inParen);
+				double ans = newCalc.evaluateExpression(inParen);	////////////////////////////////
 				valueStack.push(ans);
 			}
+			*/
 			
 			// if token is a operand, add it to stack
-			else
+			else {
 				valueStack.push(Double.parseDouble(token));
+				System.out.println("operand:\t" + token);	/////////////////////////////////////////////
+			}
 			a++;
 		}
 		
