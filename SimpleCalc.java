@@ -10,14 +10,7 @@ import java.util.List;		// used by expression evaluator
  */
  ////////////////////////////////////////////////////////////////////////////////////////////
  /*
-  *  - 5 * 6 + 1: resutls in 30 and 1 in valueStack
-  *  - empty when it shouldn't be
-  * 	- 5 + 6 + 1: op stack empty, top of val stack is 1
-  *  - need to deal with having excess operators
-  *  - chains don't work 
-  * 	- ex. addition followed by subtraction, only does adds;
-  * 		  multiplicaiton followed by division, only multiplies
-  *  	- ex. x operation y ^ z gives x ^ y ^ z
+  *  - (28 * 28 - 4 / (5 + 3) * 6.5) + 3.4 gives indexOutOfBounds
   */
 public class SimpleCalc {
 	
@@ -98,23 +91,9 @@ public class SimpleCalc {
 				else {
 					String prevOp = operatorStack.peek();
 					if (hasPrecedence(token, prevOp)) {	// if prevOp has precedence
-						operatorStack.pop();	// poping prevOp
-						double val2 = valueStack.pop();
-						double val1 = valueStack.pop();
-						if (prevOp.equals("+"))		// doing operation
-							valueStack.push(val1 + val2);
-						else if (prevOp.equals("-"))
-							valueStack.push(val1 - val2);
-						else if (prevOp.equals("/"))
-							valueStack.push(val1 / val2);
-						else if (prevOp.equals("*"))
-							valueStack.push(val1 * val2);
-						else if (prevOp.equals("%"))
-							valueStack.push(val1 % val2);
-						else
-							valueStack.push(Math.pow(val1, val2));
+						operation();
+						operatorStack.push(token);
 					}
-					
 					// if token has precedence, add it to the stack
 					else
 						operatorStack.push(token);
@@ -142,30 +121,34 @@ public class SimpleCalc {
 			a++;
 		}
 		
-		if (operatorStack.isEmpty())	///////////////////////////////////////////////////
-			System.out.println("EMPTY");
-		
 		// if there are operations left to do
-		while (!operatorStack.isEmpty()) {
-			String op = operatorStack.pop();
-			double val2 = valueStack.pop();
-			double val1 = valueStack.pop();
-			// if operator is exponent, right-associative
-			if (op.equals("^"))
-				valueStack.push(Math.pow(val2, val1));
-			else if (op.equals("+"))		// doing operation
-				valueStack.push(val1 + val2);
-			else if (op.equals("-"))
-				valueStack.push(val1 - val2);
-			else if (op.equals("/"))
-				valueStack.push(val1 / val2);
-			else if (op.equals("*"))
-				valueStack.push(val1 * val2);
-			else if (op.equals("%"))
-				valueStack.push(val1 % val2);
-		}
+		while (!operatorStack.isEmpty())
+			operation();
 	
 		return valueStack.pop();
+	}
+	
+	/**
+	 *  Performs the operation given by the top operator on operatorStack and
+	 *  the top two values on valueStack. Pops these values from their stacks
+	 *  and pushes the result onto valueStack.
+	 */
+	public void operation() {
+		String op = operatorStack.pop();	// poping prevOp
+		double val2 = valueStack.pop();
+		double val1 = valueStack.pop();
+		if (op.equals("^"))
+			valueStack.push(Math.pow(val1, val2));
+		else if (op.equals("+"))
+			valueStack.push(val1 + val2);
+		else if (op.equals("-"))
+			valueStack.push(val1 - val2);
+		else if (op.equals("/"))
+			valueStack.push(val1 / val2);
+		else if (op.equals("*"))
+			valueStack.push(val1 * val2);
+		else if (op.equals("%"))
+			valueStack.push(val1 % val2);
 	}
 	
 	/**
