@@ -8,11 +8,7 @@ import java.util.List;		// used by expression evaluator
  *	@author	Karen Ke
  *	@since	February 27, 2024
  */
- ////////////////////////////////////////////////////////////////////////////////////////////
- /*
-  *  - (28 * 28 - 4 / (5 + 3) * 6.5) + 3.4 gives indexOutOfBounds
-  *  - GO TO LINE 103
-  */
+
 public class SimpleCalc {
 	
 	private ExprUtils utils;	// expression utilities
