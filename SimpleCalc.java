@@ -8,10 +8,10 @@ import java.util.List;		// used by expression evaluator
  *	@author	Karen Ke
  *	@since	February 27, 2024
  */
- ////////////////////////////////////////////////////////////////////////////////////////////
  /*
-  *  - (28 * 28 - 4 / (5 + 3) * 6.5) + 3.4 gives indexOutOfBounds
-  *  - GO TO LINE 103
+  * - need to make identifier class
+  * - need to check name of identifier (no repeats)
+  * - no clue if anything works yet
   */
 public class SimpleCalc {
 	
@@ -49,6 +49,7 @@ public class SimpleCalc {
 			if (expression.length() == 0)
 				System.out.println("Please enter an expression or enter" +
 					" 'h' for help");
+			
 			else if (expression.equals("h"))
 				printHelp();
 				
@@ -71,74 +72,154 @@ public class SimpleCalc {
 		System.out.println("  parentheses '(' and ')'");
 	}
 	
+	/** Checks if the first token is an identifier by seeing if it contains
+	 *  letters and if it is followed by "=". If there are both letters
+	 *  and numbers, asks 
+	
 	/**
 	 *	Evaluate expression and return the value
 	 *	@param tokens	a List of String tokens making up an arithmetic expression
 	 *	@return			a double value of the evaluated expression
 	 */
 	public double evaluateExpression(List<String> tokens) {
-		double value = 0;
-		int openParenIndex = 0;
-		
 		int a = 0;
+		boolean assignVal = false;
+		
 		while (a < tokens.size()) {		// looking at all the tokens
 			String token = tokens.get(a);
-			// if tokens are operators
-			if (token.equals("+") || token.equals("-") || token.equals("*") || 
-				token.equals("/") || token.equals("%") || token.equals("^") ||
-				token.equals("(") ||token.equals(")")) {
-					
-				System.out.println("operator:\t" + token);	////////////////////////////////////////
-				
-				if (operatorStack.isEmpty() || token.equals("("))	// if token is first operator
-					operatorStack.push(token);
+			
+			if (!isValid("" + token)) {
+				System.out.println("Please enter an= valid expression or enter" +
+					" 'h' for help");
+				a = tokens.size();
+			}
+			
+			else if (isIdentifier("" + token)) {
+				// if expression is value of identifier
+				if (a == 0) {
+					assignVal = true;
+					Identifier newIdentifier = new Identifier();
+					newIdentifier.setName(token);
+					identifiers.add(newIdentifier);
+					a++;	// skips "=" as a token
+				}
 				
 				else {
-					String prevOp = operatorStack.peek();
-					if (hasPrecedence(token, prevOp)) {	// if prevOp has precedence
-						operation();
-						operatorStack.push(token);
+					boolean identifierExists = false;
+					for (int i = 0; i < identifiers.size(); i++) {
+						if (token.equals(identifiers.get(i).getName())) {
+							tokens.set(a, identifiers.get(i).getValue());4
+							identifierExists = true;
+						}
 					}
-					// if token has precedence, add it to the stack
-					else {
-						// need to evaluate all of prev expression	/////////////////////////////////////////////////////
-					}
+					if (!identifierExists)
+						tokens.set(a, 0);
+					a--;
 				}
 			}
 			
-			// if token is "(", evaluate expression until ")"
-			/*else if (token.equals("(")) {
-				List<String> inParen = new ArrayList<String>();
-				// add tokens in between () to list
-				a++;	// deals with "("
-				System.out.println(tokens.size());	///////////////////////////////////
-				while(a < tokens.size() && tokens.get(a).equals(")") == false) {	////////////////////////////////////////
-					System.out.println(tokens.get(a));	////////////////////////////////////
-					inParen.add(tokens.get(a));
-					a++;
-				}
-				System.out.println("Should be ):\t" + tokens.get(a));
-				a++;	// deals with ")"
+			// if tokens are operators
+			else if (token.equals("+") || token.equals("-") || token.equals("*") || 
+				token.equals("/") || token.equals("%") || token.equals("^") ||
+				token.equals("(") ||token.equals(")")) {
 				
-				SimpleCalc newCalc = new SimpleCalc();
-				double ans = newCalc.evaluateExpression(inParen);	////////////////////////////////
-				valueStack.push(ans);
+				boolean addedToken = false;
+				if (!operatorStack.isEmpty() && token.equals("(") == false) {
+					String prevOp = operatorStack.peek();
+					
+					// while token does not have precedence and stacks
+					// have more than one value left
+					boolean noLoop = false;
+					while (hasPrecedence(token, prevOp) && !noLoop) {
+						operation();
+						if (!operatorStack.isEmpty()) {
+							prevOp = operatorStack.peek();
+							if (token.equals(")") && prevOp.equals("(")) {
+								operatorStack.pop();
+								noLoop = true;
+							}
+						}
+						
+						if (valueStack.isEmpty() || operatorStack.isEmpty())
+							noLoop = true;
+						
+						else {
+							double topVal = valueStack.pop();
+							String topOp = operatorStack.pop();
+							if (valueStack.isEmpty() || operatorStack.isEmpty())
+								noLoop = true;
+							valueStack.push(topVal);
+							operatorStack.push(topOp);
+						}						
+					}
+				}
+				if (!token.equals(")"))
+					operatorStack.push(token);
 			}
-			*/
 			
 			// if token is a operand, add it to stack
-			else {
+			else
 				valueStack.push(Double.parseDouble(token));
-				System.out.println("operand:\t" + token);	/////////////////////////////////////////////
-			}
+
 			a++;
 		}
 		
-		// if there are operations left to do
-		while (!operatorStack.isEmpty())
+		while (!operatorStack.isEmpty())	// if there are operations left to do
 			operation();
-	
+		
+		if (assignVal)	// if need to add value to identifier
+			identifiers.get(indentifiers.size() - 1).setValue(valueStack.peek());
+		
 		return valueStack.pop();
+	}
+	
+	/**
+	 *  Checks if the token is valid (is an operator, a number, or contains
+	 *  only letters)
+	 *  @param token		the token to check, as a string
+	 *  @return 			true if token is valid, false otherwise
+	 * 
+	 */
+	public boolean isValid(String token) {
+		int firstASCII = (int)(token.charAt(0));
+		if (firstASCII >= 48 && firstASCII <= 57) {
+			for (int i = 1; i < token.length; i++) {
+				if (!(token.charAt(i) >= 48 && token.charAt(i) <= 57))
+					return false;
+			}
+		}
+		
+		else if (firstASCII >= 65 && firstASCII <= 90 || firstASCII >= 97 &&
+				 firstASCII <= 122) {
+			for (int i = 1; i < token.length; i++) {
+				if (!(firstASCII >= 65 && firstASCII <= 90 || 
+						firstASCII >= 97 && firstASCII <= 122))
+					return false;
+			}
+		}
+		
+		else if (!(token.equals("+") || token.equals("-") || token.equals("*") || 
+				token.equals("/") || token.equals("%") || token.equals("^") ||
+				token.equals("(") ||token.equals(")")))
+			return false;
+			
+		return true;
+	}
+	
+	/**
+	 * 	Checks if token is identifier. Token is identifier if it the first
+	 *  character is a letter (assuming that the token is valid)
+	 *  @param token	token being checked, as a string
+	 *  @return			true if token is an identifier, false otherwise
+	 */
+	public boolean isIdentifier(String token) {
+		int ascii = (int)(token.charAt(0));
+		// if characters aren't letters, not an identifier
+		if (!(firstASCII >= 65 && firstASCII <= 90 || firstASCII >= 97 &&
+				 firstASCII <= 122))
+			return false;
+		
+		return true;
 	}
 	
 	/**
@@ -184,5 +265,4 @@ public class SimpleCalc {
 			return false;
 		return true;
 	}
-	 
 }
