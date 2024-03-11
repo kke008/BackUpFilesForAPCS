@@ -8,23 +8,20 @@ import java.util.List;		// used by expression evaluator
  *	@author	Karen Ke
  *	@since	February 27, 2024
  */
- /*
-  * - need to make identifier class
-  * - need to check name of identifier (no repeats)
-  * - no clue if anything works yet
-  */
 public class SimpleCalc {
 	
 	private ExprUtils utils;	// expression utilities
 	
 	private ArrayStack<Double> valueStack;		// value stack
 	private ArrayStack<String> operatorStack;	// operator stack
+	private List<Identifier> identifiers;		// list of identifiers
 
 	// constructor	
 	public SimpleCalc() {
 		utils = new ExprUtils();
 		valueStack = new ArrayStack<Double>();
 		operatorStack = new ArrayStack<String>();
+		identifiers = new ArrayList<Identifier>();
 	}
 	
 	public static void main(String[] args) {
@@ -34,8 +31,23 @@ public class SimpleCalc {
 	
 	public void run() {
 		System.out.println("\nWelcome to SimpleCalc!!!");
+		setMathIdentifiers();
 		runCalc();
 		System.out.println("\nThanks for using SimpleCalc! Goodbye.\n");
+	}
+	
+	/** Sets the values of e and pi
+	 */
+	public void setMathIdentifiers() {
+		Identifier e = new Identifier();
+		e.setName("e", identifiers);
+		e.setValue(Math.E);
+		identifiers.add(e);
+		
+		Identifier pi = new Identifier();
+		pi.setName("pi", identifiers);
+		pi.setValue(Math.PI);
+		identifiers.add(pi);
 	}
 	
 	/**
@@ -49,32 +61,74 @@ public class SimpleCalc {
 			if (expression.length() == 0)
 				System.out.println("Please enter an expression or enter" +
 					" 'h' for help");
-			
 			else if (expression.equals("h"))
 				printHelp();
-				
+			else if (expression.equals("l"))
+				printListOfIdentifiers();
 			else {
+				boolean setToken = false;
+				Identifier newId = new Identifier();
+				if (expression.indexOf('=') != -1) {
+					newId = makeId(expression.substring(0, expression.indexOf('=')));
+					expression = expression.substring(expression.indexOf('=') + 1);
+					setToken = true;
+				}
 				List<String> tokens = utils.tokenizeExpression(expression);
-				double answer = evaluateExpression(tokens);
+					double answer = evaluateExpression(tokens);
+				
+				System.out.print("  ");
+				
+				if (setToken) {
+					newId.setValue(answer);
+					System.out.print(newId.getName() + "\t = ");
+				}
 				System.out.println(answer);
 			}
 			expression = prompt.getString("");
 		}
 	}
 	
+	/** Returns identifier with given name. t If no such identifier exists, makes
+	 *  one and adds it to the list.
+	 *  @param name		name of identifier to make
+	 *  @return			existing identifier with given name if it exists,
+	 * 					new identifier with given name otherwise
+	 */
+	public Identifier makeId(String name) {
+		name = name.trim();
+		
+		// checking if identifier already exists
+		for (int r = 0; r < identifiers.size(); r++) {
+			if (name.equals(identifiers.get(r).getName()))
+				return identifiers.get(r);
+		}
+		
+		Identifier newId = new Identifier();
+		newId.setName(name, identifiers);
+		identifiers.add(newId);
+		return newId;
+	}
+	
 	/**	Print help */
 	public void printHelp() {
 		System.out.println("Help:");
-		System.out.println("  h - this message\n  q - quit\n");
+		System.out.println("  h - this message\n  i - displays list of current " +
+			"identifiers\n  q - quit\n");
 		System.out.println("Expressions can contain:");
 		System.out.println("  integers or decimal numbers");
 		System.out.println("  arithmetic operators +, -, *, /, %, ^");
 		System.out.println("  parentheses '(' and ')'");
+		System.out.println("  identifiers that only contain letters");
 	}
 	
-	/** Checks if the first token is an identifier by seeing if it contains
-	 *  letters and if it is followed by "=". If there are both letters
-	 *  and numbers, asks 
+	/** Prints list of current identifiers */
+	public void printListOfIdentifiers() {
+		System.out.println("Identifiers:");
+		for (int v = 0; v < identifiers.size(); v++) {
+			Identifier id = identifiers.get(v);
+			System.out.printf("\t%-16s=%12f\n", id.getName(), id.getValue()); 
+		}
+	}
 	
 	/**
 	 *	Evaluate expression and return the value
@@ -83,42 +137,27 @@ public class SimpleCalc {
 	 */
 	public double evaluateExpression(List<String> tokens) {
 		int a = 0;
-		boolean assignVal = false;
 		
 		while (a < tokens.size()) {		// looking at all the tokens
 			String token = tokens.get(a);
 			
-			if (!isValid("" + token)) {
-				System.out.println("Please enter an= valid expression or enter" +
-					" 'h' for help");
-				a = tokens.size();
-			}
-			
-			else if (isIdentifier("" + token)) {
-				// if expression is value of identifier
-				if (a == 0) {
-					assignVal = true;
-					Identifier newIdentifier = new Identifier();
-					newIdentifier.setName(token);
-					identifiers.add(newIdentifier);
-					a++;	// skips "=" as a token
-				}
-				
-				else {
-					boolean identifierExists = false;
-					for (int i = 0; i < identifiers.size(); i++) {
-						if (token.equals(identifiers.get(i).getName())) {
-							tokens.set(a, identifiers.get(i).getValue());4
-							identifierExists = true;
-						}
+			// if token is identifier, find value and replace token with it
+			if (isIdentifier(token)) {
+				boolean found =  false;
+				int i = 0;
+				while(i < identifiers.size() && !found) {
+					if (token.equals(identifiers.get(i).getName())) {
+						found = true;
+						tokens.set(a, "" + identifiers.get(i).getValue());
 					}
-					if (!identifierExists)
-						tokens.set(a, 0);
-					a--;
+					i++;
 				}
-			}
+				if (!found)
+					tokens.set(a, "0");
+				a--;
+			}		
 			
-			// if tokens are operators
+			// if token is operator, compare with previous operator
 			else if (token.equals("+") || token.equals("-") || token.equals("*") || 
 				token.equals("/") || token.equals("%") || token.equals("^") ||
 				token.equals("(") ||token.equals(")")) {
@@ -167,9 +206,6 @@ public class SimpleCalc {
 		while (!operatorStack.isEmpty())	// if there are operations left to do
 			operation();
 		
-		if (assignVal)	// if need to add value to identifier
-			identifiers.get(indentifiers.size() - 1).setValue(valueStack.peek());
-		
 		return valueStack.pop();
 	}
 	
@@ -183,7 +219,7 @@ public class SimpleCalc {
 	public boolean isValid(String token) {
 		int firstASCII = (int)(token.charAt(0));
 		if (firstASCII >= 48 && firstASCII <= 57) {
-			for (int i = 1; i < token.length; i++) {
+			for (int i = 1; i < token.length(); i++) {
 				if (!(token.charAt(i) >= 48 && token.charAt(i) <= 57))
 					return false;
 			}
@@ -191,7 +227,7 @@ public class SimpleCalc {
 		
 		else if (firstASCII >= 65 && firstASCII <= 90 || firstASCII >= 97 &&
 				 firstASCII <= 122) {
-			for (int i = 1; i < token.length; i++) {
+			for (int i = 1; i < token.length(); i++) {
 				if (!(firstASCII >= 65 && firstASCII <= 90 || 
 						firstASCII >= 97 && firstASCII <= 122))
 					return false;
@@ -215,8 +251,7 @@ public class SimpleCalc {
 	public boolean isIdentifier(String token) {
 		int ascii = (int)(token.charAt(0));
 		// if characters aren't letters, not an identifier
-		if (!(firstASCII >= 65 && firstASCII <= 90 || firstASCII >= 97 &&
-				 firstASCII <= 122))
+		if (!(ascii >= 65 && ascii <= 90 || ascii >= 97 && ascii <= 122))
 			return false;
 		
 		return true;
@@ -265,4 +300,70 @@ public class SimpleCalc {
 			return false;
 		return true;
 	}
+}
+
+/** 
+ *  Assinging names and values to identifiers to be used in SimpleCalc expressions.
+ *  Values are either set in SimpleCalc or assumed to be 0.
+ * 
+ *  @author Karen Ke
+ *  @since March 8, 2024
+ */
+class Identifier {
+	private String name;			// name of identifier
+	private double value;			// value of identifier
+	private List<Identifier> list;	// list of existing identifiers
+	
+	public Identifier() {
+		name = "";
+		value = 0;
+		list = new ArrayList<Identifier>();
+	}	
+	
+	/** Sets proposed name and the list of existing identifiers, then calls  
+	 *  nameWorks() to check if the name is valid. If not, it prompts the user 
+	 *  for a new name. If identifier (name) already exists, changes the value
+	 *  of the identifier
+	 *  @param nameIn		the proposed name
+	 *  @param listIn		the list of existing identifiers
+	 */
+	public void setName(String nameIn, List<Identifier> listIn) { 
+		name = nameIn; 
+		list = listIn;
+		while (!nameWorks(name))
+			name = Prompt.getString("Please enter a new name");
+	}
+	
+	/** Checks if the proposed name works:
+	 *  	1. name must not be q or h or l
+	 * 		2. name must contain only letters
+	 *  @param name		the proposed name
+	 *  @return			false if name violates one of the conditions, true otherwise
+	 */
+	public boolean nameWorks(String name) {
+		if (name.equals("q") || name.equals("h") || name.equals("l")) {
+			System.out.println("\nIdentifier names can't be 'q' or 'h' or 'l'.");
+			return false;
+		}	
+		for (int i = 0; i < name.length(); i++) {
+			int charASCII = (int)(name.charAt(i));
+			if (charASCII < 65 || (charASCII > 90 && charASCII < 97) || charASCII > 122) {
+				System.out.print("\nIdentifier names can only contain letters " +
+					"and can't be the same as that of an existing identifier.");
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/** Sets value of identifier
+	 * 	@param valueIn		value to set
+	 */ 
+	public void setValue(double valueIn) { value = valueIn; }
+	
+	/** @return name	name of identifier */
+	public String getName() { return name; }
+	
+	/** @return value	value of identifier */
+	public double getValue() { return value; }
 }
