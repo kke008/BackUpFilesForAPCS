@@ -5,10 +5,12 @@ a	second	constructor	with	a	parameter	that	specifies	the	lifetime.
 
 b)	 Each	Blossom	has	a	random	lifetime,	some	short	and	some	long.
 */
+package info.gridworld.actor;
+
 import java.awt.Color;
 
 public class Blossom extends Flower {
-	private int lifetime;	// the amount of "lifes" the blossom has left
+	private int lifetime;	// the amount of "lives" the blossom has left
 	private static final double DARKENING_FACTOR = 0.05;
 	
 	public Blossom() {
