@@ -22,13 +22,16 @@ import info.gridworld.actor.Actor;
 import java.awt.Color;
 
 public class Jumper extends Bug {
-	private int maxInOneDirection;	//////////////////////////////////////////////////////////////////
+	private int maxInOneDirection;	// maximum moves Jumper can make in one direction
+									// before turning
+	private int movedInOneDirection;	// moves Jumper has made in one direction
 	private int turned;		// number of times Jumper has turned trying to move
 	private boolean jumpTwo;	// true if Jumper is trying to jump two spots away
 	
 	public Jumper() {
 		setColor(Color.BLUE);
-		maxInOneDirection = 10;
+		maxInOneDirection = 5;
+		movedInOneDirection = 0;
 		turned = 0;
 		jumpTwo = true;
 	}
@@ -38,9 +41,10 @@ public class Jumper extends Bug {
      */
     public void act()
     {
-        if (canMove()) {
+        if (canMove() && movedInOneDirection <= maxInOneDirection) {
             move();
             turned = 0;
+            movedInOneDirection++;
 		}
         else {
             turn();
@@ -58,6 +62,7 @@ public class Jumper extends Bug {
     public void turn()
     {
         setDirection(getDirection() + Location.HALF_RIGHT);
+        movedInOneDirection = 0;
     }
 
     /**
@@ -73,11 +78,14 @@ public class Jumper extends Bug {
         Location next = loc.getAdjacentLocation(getDirection());
         if (jumpTwo)
 			next = next.getAdjacentLocation(getDirection());
-        if (gr.isValid(next))
+        if (gr.isValid(next)) {
             moveTo(next);
+            jumpTwo = true;
+		}
         else
             removeSelfFromGrid();
-        Blossom blossom = new Blossom();
+        int blossomLifetime = (int)(Math.random() * 20 + 1);
+        Blossom blossom = new Blossom(blossomLifetime);
         blossom.putSelfInGrid(gr, loc);
     }
 
