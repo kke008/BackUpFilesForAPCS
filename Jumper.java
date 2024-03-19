@@ -36,6 +36,14 @@ public class Jumper extends Bug {
 		jumpTwo = true;
 	}
 	
+	public Jumper(int maxIn) {
+		setColor(Color.BLUE);
+		maxInOneDirection = maxIn;
+		movedInOneDirection = 0;
+		turned = 0;
+		jumpTwo = true;
+	}
+	
 	 /**
      * Moves if it can move, turns otherwise.
      */
@@ -90,8 +98,7 @@ public class Jumper extends Bug {
     }
 
     /**
-     * Tests whether this bug can move forward into a location that is empty or
-     * contains a flower.
+     * Tests whether this bug can move forward into a location that is empty.
      * @return true if this bug can move.
      */
     public boolean canMove()
@@ -106,8 +113,8 @@ public class Jumper extends Bug {
         if (!gr.isValid(next))
             return false;
         Actor neighbor = gr.get(next);
-        return (neighbor == null) || (neighbor instanceof Blossom);
-        // ok to move into empty location or onto blossom
+        return (neighbor == null);
+        // ok to move into empty location
         // not ok to move onto any other actor
     }
 }
