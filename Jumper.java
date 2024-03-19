@@ -98,7 +98,8 @@ public class Jumper extends Bug {
     }
 
     /**
-     * Tests whether this bug can move forward into a location that is empty.
+     * Tests whether this bug can move forward into a location that is empty
+     * or is occupied by a flower.
      * @return true if this bug can move.
      */
     public boolean canMove()
@@ -113,8 +114,8 @@ public class Jumper extends Bug {
         if (!gr.isValid(next))
             return false;
         Actor neighbor = gr.get(next);
-        return (neighbor == null);
-        // ok to move into empty location
+        return (neighbor == null|| (neighbor instanceof Flower));
+        // ok to move into empty location or a flower
         // not ok to move onto any other actor
     }
 }
