@@ -22,7 +22,7 @@ public class BlusterCritter extends Critter {
 	
 	public BlusterCritter (int courageIn) {
 		darkeningFactor = 0.05;
-		c = courageIn;
+		courage = courageIn;
 	}
 	
 	/** Overrides the getActors() method in Critter. Returns all of the actors
@@ -30,15 +30,15 @@ public class BlusterCritter extends Critter {
 	 * 	
 	 * 	@return actors		all of the actors within 2 steps
 	 */
-	public ArrayList<Actors> getActors() {
-		ArrayList<Actors> actors;
+	public ArrayList<Actor> getActors() {
+		ArrayList<Actor> actors = new ArrayList<Actor>();
 		for (int i = 0; i < 8; i++) {
 			int direction = getDirection() + 45*i;
 			Location loc = getLocation();
 			Location next = loc.getAdjacentLocation(direction);
 			int j = 0;
 			while (getGrid().isValid(next) && j < 2) {
-				actor.add(grid.get(loc));
+				actors.add(getGrid().get(loc));
 				next = next.getAdjacentLocation(direction);
 			}
 		}
