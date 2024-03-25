@@ -25,14 +25,14 @@ public class ChameleonKid extends ChameleonCritter {
     public ArrayList<Actor> getActors()
     {
 		ArrayList<Actor> actors = new ArrayList<Actor>();
-		Grid<Actor> grid = getGrid();
 		Location loc = getLocation();
-		Actor actor = grid.get(loc.getAdjacentLocation(getDirection()));
-		if (actor != null)
-			actors.add(actor);
-		actor = getGrid().get(loc.getAdjacentLocation(getDirection() + Location.HALF_CIRCLE));
-		if (actor != null)
-			actors.add(actor);
+		Location front = loc.getAdjacentLocation(getDirection());
+		if (getGrid().isValid(front) && getGrid().get(front) != null)
+			actors.add(getGrid().get(front));
+		
+		Location back = loc.getAdjacentLocation(getDirection() + Location.HALF_CIRCLE);
+		if (getGrid().isValid(back) && getGrid().get(back) != null)
+			actors.add(getGrid().get(back));
 		
         return actors;
     }
