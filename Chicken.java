@@ -1,12 +1,11 @@
 /* Extends Critter. Chicken starts out white. Every step, Chicken randomly
  * chooses to move forward or makes a random turn in any of the 8 compass
- * directions. After 200 steps, the Chicken is middled aged and moves or
- * turns only every other step. After 280 steps, the Chicken is elderly
+ * directions. While the Chicken is young, it has a 1 in 20 percent chance
+ * of laying an egg. After 200 steps, the Chicken is middled aged and moves
+ * or turns only every other step. After 280 steps, the Chicken is elderly
  * so it starts to gray and only moves every fourth steps. After 300 steps,
  * the Chicken dies and is replaced by a tombstone.
  *
-
-
  * @author Karen Ke
  * @since March 27, 2024
  */
@@ -34,15 +33,22 @@ public class Chicken extends Critter {
   public void makeMove(Location loc) {
     if (nthStep == age) {
       int randNum = (int)(Math.random()*10);
-      if (randNum == 0 && loc != null)
-          moveTo(loc);
+      if (randNum == 0 && loc != null) {
+        Location currentLoc = getLocation();
+        moveTo(loc);
+        if (age == 1) {  // if young, has 1 in 20 change of laying egg
+          int randNum2 = (int)(Math.random()*20);
+          if (randNum2 == 2)
+            getGrid().put(currentLoc, new Egg());
+        }
+      }
       else
           moveTo(getLocation().getAdjacentLocation(randNum * 45));
     }
     else
       nthStep++;
 
-    if (age == 4) {
+    if (age == 4) {    // if elderly, gets grayer
       Color c = getColor();
       int avg = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
       Color newC = new Color(avg, avg, avg);
