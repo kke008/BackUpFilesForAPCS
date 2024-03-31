@@ -13,6 +13,11 @@ than one Chicken is a neighbor, then the Fox picks one Chicken at random to eat.
 “eats” by replacing the Chicken with a Tombstone. After the Chicken is eaten, the Fox’s
 stomach is full and it takes a “nap” in which it does not move or eat for 10 steps. After the nap, the
 Fox is hungry again and chases after Chickens like in 2 above.
+
+Make the Fox die. A Fox dies when it has been hungry for too long. A new Fox always starts as
+though it just finished napping and is hungry. Keep track of how many steps the Fox takes while
+hungry (after nap). After 20 steps of being hungry, the Fox has now starved to death and is
+replaced in the same location with a Tombstone.
 */
 import info.gridworld.grid.Grid;
 import info.gridworld.grid.Location;
@@ -27,6 +32,7 @@ public class Fox extends Critter {
 	private boolean nearestChickenExists;
 	private boolean move;
 	private int nap;
+	private int hungry;
   
 	public Fox() {
 		setColor(null);
@@ -34,6 +40,7 @@ public class Fox extends Critter {
 		nearestChickenExists = false;
 		move = true;
 		nap = 0;
+		hungry = 0;
 	}
 
 	public void processActors(ArrayList<Actor> actors) {
@@ -67,6 +74,10 @@ public class Fox extends Critter {
 	}
 	
 	public void move(ArrayList<Location> locs) {
+		if (hungry == 20) {
+			Tombstone ts = new Tombstone();
+			ts.putSelfInGrid(getGrid(), getLocation());
+		}
 		if (nap == 0) {
 			Location loc1 = getLocation();
 			if (nearestChickenExists) {
@@ -78,16 +89,20 @@ public class Fox extends Critter {
 					if (adjActor instanceOf Chicken) {
 						adjActor.removeSelfFromGrid();
 						Tombstone ts = new Tombstone();
-						ts.putSelfInGrid(locToNC);
+						ts.putSelfInGrid(getGrid(), locToNC);
 						nap = 10;
+						hungry = 0;
 					}
 					else {
 						setDirection(dirToNC);
 						moveTo(locToNC);
+						hungry++;
 					}
 				}
-				else
+				else {
 					nearestChickenExists = false;
+					hungry++;
+				}
 			}
 		    
 			if (move && !nearestChickenExists) {
