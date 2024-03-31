@@ -17,54 +17,105 @@ import java.awt.Color;
 COMMENTS
 
 public class Fox extends Critter {
-  private Chicken nearestChicken;
-  private int directionsTried;
+  private Location locOfNearestChicken;
+  private boolean nearestChickenExists;
   private boolean move;
-  private boolean areOtherChickens;
   
   public Fox() {
     setColor(null);
-    nearestChicken = new Chicken();
-    directionsTried = 0;
+    locOfNearestChicken = new Location();
+    nearestChickenExists = false;
     move = true;
-    areOtherChickens = true;
+  }
+
+  public void processActors(ArrayList<Actor> actors) {
+    ArrayList<Chicken> chickens = new ArrayList<Chicken>();
+    for (Actor a : actors) {
+      if (a instanceOf Chicken)
+          chickens.add(a);
+    }
+
+    if (chickens.size() != 0) {
+      nearestChickenExists = true;
+      double longestDistance = 0;
+      for (int c = 0; c < chickens.size(); c++) {
+        Chicken chick = chickens.get(c);
+        Location chickLoc = chick.getLocation();
+        double rowVal = Math.pow(chickLoc.getRow() - getRow(), 2);
+        double colVal = Math.pow(chickLoc.getCol() - getCol(), 2);
+        double distance = Math.squr(rowVal + colVal);
+        if (distance > longestDistance) {
+          longestDistance = distance;
+          locOfNearestChicken = chick.getLocation();
+        }
+
+        else if (distance == longestDistance) {
+          int randNum = (int)(Math.random()*2)
+          if (randNum == 1)
+            locOfNearestChicken = chick.getLocation();
+        }
+      }
+    }
+    
+    if (areOtherChickens) { /////////////////////////////////////////////////////////////////////
+      Location locOfNearestChicken = getLoNC(loc1);
+      if (locationOfNearestChicken == null)
+        areOtherChickens = false;
+      else {
+        
+      }
+    }
   }
 
   public void move(ArrayList<Location> locs) {
     Location loc1 = getLocation();
-    ArrayList<Chicken> chickens = getGrid().getNeightbors(loc1);
-    if (chickens.size() == 0)
-      areOtherChickens = false;
-    
-    if (directionsTried == 7) {
-      directionsTried = 0;
-      move = false;
-    }
 
-    if (areOtherChickens) { /////////////////////////////////////////////////////////////////////
-      int closestChickenIndex = getCCI(chickens);
-    }
-    
-    else if (move) {
-      Location locInDir = loc1.getAdjacentLocation(directionsTried * 45);
-      if (getGrid().isValid(locInDir) && getGrid().get(locInDir) == null) {
-        setDirection(loc1.getDirectionToward(locInDir));
-        moveTo(locInDir);
+    if (nearestChickenExists) {
+      Direction dirToNC = loc1.getDirectionTowards(locOfNearestChicken);
+      Location locToNC = loc1.getAdjacentLocation(toNC);
+      if (getGrid().isValid(locToNC) && getGrid().get(locToNC) == false) {
+        setDirection(dirToNC);
+        moveTo(locToNC);
       }
       else
-        directionsTried++;
+        nearestChickenExists = false;
+    }
+    
+    if (move && !nearestChickenExists) {
+      boolean dirWorks = false;
+      int[] randDirections = makeRandomDirections();
+      int d = -1;
+      do {
+        d++;
+        int dir = randDirections[d];
+        Location locInDir = loc1.getAdjacentLocation(dir);
+        if (getGrid().isValid(locInDir) && getGrid().get(locInDir) == null) {
+          dirWorks = true;
+          setDirection(dir);
+          moveTo(locInDir);
+        }
+      } while (d < randDirections.length && !directionWorks);
+
+      if (!dirWorks)
+          move = false;
     }
 
-    else {
+    if (!move) {
       int randDir = (int)(Math.random()*7)
       setDirection(randDir * 45);
+      move = true;
     }
   }
 
-  public int getCCI(ArrayList<Chicken> chickens) { /////////////////////////////////////////////////////////////////////
-    int chickenIndex = 0;
-    for (int i = 0; i < chickens.size(); i++) {
-      
-    }
+  public int[] makeRandomDirections() {
+    int[] randomDirections = new int[8];
+		for (int i = 0; i < 8; i++) {
+			int ind = 0;
+			while (randomDirections[ind] != 0) {
+				ind = (int)(Math.random() * 9);
+			}
+			randomDirections[ind] = i;
+		}
+    return randomDirections;
   }
 }
