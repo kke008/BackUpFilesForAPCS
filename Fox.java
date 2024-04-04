@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 public class Fox extends Critter {
-	private Location locOfNearestChicken;
+	private int dirOfNearestChicken;
 	private boolean nearestChickenExists;
 	private boolean move;
 	private int nap;
@@ -23,7 +23,7 @@ public class Fox extends Critter {
 	/** Foxes are null in color*/
 	public Fox() {
 		setColor(null);
-		locOfNearestChicken = getLocation();
+		dirOfNearestChicken = 0;
 		nearestChickenExists = false;
 		move = true;
 		nap = 0;
@@ -63,27 +63,32 @@ public class Fox extends Critter {
 		
 		if (chickens.size() != 0) {		// if there are chickens nearby
 			nearestChickenExists = true;
-			double longestDistance = 0;
+			
+			double rows = getGrid().getNumRows() * getGrid().getNumRows();
+			double cols = getGrid().getNumCols() * getGrid().getNumCols();
+			
+			double shortestDistance = Math.sqrt(rows + cols);
 			for (int c = 0; c < chickens.size(); c++) {
 				Actor chick = chickens.get(c);
 				Location chickLoc = chick.getLocation();
 				double diffRow = chickLoc.getRow() - getLocation().getRow();
 				double diffCol = chickLoc.getCol() - getLocation().getCol();
-				double rowVal = Math.pow(diffRow, 2);
-				double colVal = Math.pow(diffCol, 2);
+				double rowVal = diffRow * diffRow;
+				double colVal = diffCol * diffCol;
 				double distance = Math.sqrt(rowVal + colVal);
-				if (distance > longestDistance) {
-					longestDistance = distance;
-					locOfNearestChicken = chick.getLocation();
+				
+				if (distance < shortestDistance) {
+					shortestDistance = distance;
+					dirOfNearestChicken = getLocation().getDirectionToward(chickLoc);
 				}
 	
-				else if (distance == longestDistance) {
+				else if (distance == shortestDistance) {
 					int randNum = (int)(Math.random()*2);
-						if (randNum == 1)
-						locOfNearestChicken = chick.getLocation();
+					if (randNum == 1)
+						dirOfNearestChicken = getLocation().getDirectionToward(chickLoc);
 				}
 			}
-			setDirection(getLocation().getDirectionToward(locOfNearestChicken));
+			setDirection(dirOfNearestChicken);
 		}
 	}
 	
@@ -107,18 +112,18 @@ public class Fox extends Critter {
 		}
 		else if (nap == 0) {
 			Location loc1 = getLocation();
-			System.out.println(nearestChickenExists);	/////////////////////////////
 			if (nearestChickenExists) {
-				Location locToNC = loc1.getAdjacentLocation(getDirection());
+				Location locToNC = loc1.getAdjacentLocation(dirOfNearestChicken);
 				  
-				if (locToNC.equals(locOfNearestChicken)) {
-						System.out.println("is a chicken");	//////////////////////
-						getGrid().get(locOfNearestChicken).removeSelfFromGrid();
-						nearestChickenExists = false;
-						Tombstone ts = new Tombstone();
-						ts.putSelfInGrid(getGrid(), locToNC);
-						nap = 10;
-						hungry = 0;
+				if (getGrid().get(locToNC) instanceof Chicken) {
+					System.out.println("is chicken");	///////////////////////////////////
+					getGrid().get(locToNC).removeSelfFromGrid();
+					nearestChickenExists = false;
+					System.out.println(locToNC.getRow() + "\t" + locToNC.getCol());	/////////////////////////
+					Tombstone ts = new Tombstone();
+					ts.putSelfInGrid(getGrid(), locToNC);
+					nap = 10;
+					hungry = 0;
 				}
 				moveTo(locToNC);
 				hungry++;
