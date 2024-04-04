@@ -27,7 +27,7 @@ public class Chicken extends Critter {
   
 	public Chicken() {
 		steps = 0;
-		age = 1;	///////////////////////////////////////////////////////
+		age = 1;
 		nthStep = 0;
 		setColor(Color.WHITE);
 	}
@@ -104,13 +104,13 @@ public class Chicken extends Critter {
 		}
 
 		steps++;
-		if (steps == 200)
-			age = 2;
-		else if (steps == 280)
-			age = 4;
-		else if (steps == 300) {
+		if (steps >= 300) {
 			Tombstone ts = new Tombstone();
 			ts.putSelfInGrid(getGrid(), getLocation());
 		}
+		else if (steps >= 280)
+			age = 4;
+		else if (steps >= 200)
+			age = 2;
 	}
 }
