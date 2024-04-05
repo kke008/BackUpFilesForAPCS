@@ -116,16 +116,15 @@ public class Fox extends Critter {
 				Location locToNC = loc1.getAdjacentLocation(dirOfNearestChicken);
 				  
 				if (getGrid().get(locToNC) instanceof Chicken) {
-					System.out.println("is chicken");	///////////////////////////////////
 					getGrid().get(locToNC).removeSelfFromGrid();
 					nearestChickenExists = false;
-					System.out.println(locToNC.getRow() + "\t" + locToNC.getCol());	/////////////////////////
 					Tombstone ts = new Tombstone();
 					ts.putSelfInGrid(getGrid(), locToNC);
 					nap = 10;
 					hungry = 0;
 				}
-				moveTo(locToNC);
+				else
+					moveTo(locToNC);
 				hungry++;
 			}
 		    
