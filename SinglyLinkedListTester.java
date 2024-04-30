@@ -23,16 +23,16 @@ public class SinglyLinkedListTester
 	public void run()
 	{
 		System.out.println("\nSingly Linked List Tester\n-------------------------");
-		testAdd();					// Assignment 1 
-		testAddIndex();				// Assignment 2
-		testClear();				// Assignment 3
+	//	testAdd();					// Assignment 1 
+	//	testAddIndex();				// Assignment 2
+	//	testClear();				// Assignment 3
 		testSize();					// Assignment 4
-		testGet();					// Assignment 5
-		testSet();					// Assignment 6
-		testRemove();				// Assignment 7
-		testIsEmpty();				// Assignment 8 and 11 (copy constructor)
-		testContains();				// Assignment 9
-		testIndexOf();				// Assignment 10
+	//	testGet();					// Assignment 5
+	//	testSet();					// Assignment 6
+	//	testRemove();				// Assignment 7
+	//	testIsEmpty();				// Assignment 8 and 11 (copy constructor)
+	//	testContains();				// Assignment 9
+	//	testIndexOf();				// Assignment 10
 		System.out.println();
 	}
 	
