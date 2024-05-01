@@ -17,13 +17,19 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	
 	/** Copy constructor */
 	public SinglyLinkedList(SinglyLinkedList<E> oldList) {
-		head = oldList.get(0);
+		for (int i = 0; i < oldList.size(); i++) {
+			add(oldList.get(i).getValue());
+		}
+		head = get(0);
+		tail = get(size() - 1);
+		/*head = oldList.get(0);
 		int i = 1;
 		while (i < oldList.size()) {
 			add(oldList.get(i).getValue());
 			if (i == oldList.size() - 1)
 				tail = oldList.get(i);
 		}
+		*/
 	}
 	
 	/**	Clears the list of elements */
@@ -90,13 +96,15 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	public int size() {
 		if (isEmpty())
 			return 0;
+		
 		int i = 0;
 		ListNode<E> node = head;
 		while (node != null) {
 			node = node.getNext();
 			i++;
 		}
-		return (i - 1);
+		
+		return i;
 	}
 	
 	/**	Return the ListNode at the specified index
@@ -105,14 +113,12 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	 *	@throws NoSuchElementException if index does not exist
 	 */
 	public ListNode<E> get(int index) {
-		if (index < 0 || index > size() - 1)
+		if (index < 0 || index >= size() || isEmpty())
 			throw new NoSuchElementException();
-			
-		int i = 0;
-		ListNode<E> node = head;
-		while (i < index) {
+		
+		ListNode<E> node = head;	
+		for (int i = 1; i <= index; i++) {
 			node = node.getNext();
-			i++;
 		}
 		return node;
 	}
