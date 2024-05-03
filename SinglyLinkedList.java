@@ -146,8 +146,13 @@ public class SinglyLinkedList<E extends Comparable<E>>
 			
 		E oldVal = get(index).getValue();
 		if (index == 0) {
-			head.setValue(null);
-			head = get(1);
+			ListNode<E> oldHead = head;
+			oldHead.setValue(null);
+			if (size() > 1)
+				head = get(1);
+			else
+				head = null;
+			oldHead.setNext(null);
 		}
 		
 		else if (index == size() - 1) {
@@ -179,8 +184,12 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	 *	@return				true if the object is in the list; false otherwise
 	 */
 	public boolean contains(E object) {
-		if (indexOf(object) >= 0)
-			return true;
+		ListNode<E> node = head;
+		while(node != null) {
+			if (node.getValue().equals(object))
+				return true;
+			node = node.getNext();
+		}
 		return false;
 	}
 	
@@ -190,11 +199,14 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	 */
 	public int indexOf(E element) {
 		int i = 0;
-		while (i < size()) {
-			ListNode<E> node = get(i);
+		ListNode<E> node = head;
+		while(node != null) {
 			if (node.getValue().equals(element))
 				return i;
-		}return -1;
+			i++;
+			node = node.getNext();
+		}
+		return -1;
 	}
 	
 	/**	Prints the list of elements */
