@@ -22,14 +22,6 @@ public class SinglyLinkedList<E extends Comparable<E>>
 		}
 		head = get(0);
 		tail = get(size() - 1);
-		/*head = oldList.get(0);
-		int i = 1;
-		while (i < oldList.size()) {
-			add(oldList.get(i).getValue());
-			if (i == oldList.size() - 1)
-				tail = oldList.get(i);
-		}
-		*/
 	}
 	
 	/**	Clears the list of elements */
@@ -186,7 +178,7 @@ public class SinglyLinkedList<E extends Comparable<E>>
 	public boolean contains(E object) {
 		ListNode<E> node = head;
 		while(node != null) {
-			if (node.getValue().equals(object))
+			if (node.getValue().compareTo(object) == 0)
 				return true;
 			node = node.getNext();
 		}
