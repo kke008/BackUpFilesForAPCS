@@ -8,8 +8,7 @@
  *	@author	Karen Ke
  *	@since	May 7, 2024
  */
- ///////////////// if new coordinates are invalid and can't have negative
-				// coords then just return old coord and figure it out in snakeDies()
+
 public class SnakeGame {
 	
 	private Snake snake;		// the snake in the game
@@ -46,41 +45,53 @@ public class SnakeGame {
 	public void run() {
 		printIntroduction();
 		
-		// while game is not over:
-		board.printBoard(snake, target);
-		String guide = "Score: " + score + " (w - North, s - South, " +
-			"d - East, a - West, h - help)";
-		char move = ' ';
-		while (move != 'w' || move != 's' || move != 'd' || move != 'a' ||
-			move != 'h') {
-			 Prompt.getChar(guide);
-		 }
-		
-		Coordinate last = snake.get(snake.size() - 1).getValue();
-		Coordinate newHead = snake.get(0);
-		if (move == 'w')
-			newHead = getNorth(newHead);
-		else if (move == 's')
-			newHead = getSouth(newHead);
-		else if (move == 'd')
-			newHead = moveEast(newHead);
-		else if (move == 'a')
-			newHead = getWest(newHead);
-		else 
-			helpMenu();
+		boolean gameOver = false;
+		while (!gameOver) {
+			board.printBoard(snake, target);
+			String guide = "Score: " + score + " (w - North, s - South, " +
+				"d - East, a - West, h - help)";
+			char move = ' ';
+			while (move != 'w' && move != 's' && move != 'd' && move != 'a' &&
+				move != 'h' && move != 'q') {
+				move = Prompt.getChar(guide);
+			 }
 			
-		if(newHead.equals(target)) {
+			Coordinate newHead = snake.get(0).getValue();
+			if (move == 'w')
+				newHead = getNorth(newHead);
+			else if (move == 's')
+				newHead = getSouth(newHead);
+			else if (move == 'd')
+				newHead = getEast(newHead);
+			else if (move == 'a')
+				newHead = getWest(newHead);
+			else if (move == 'h')
+				helpMenu();
+			
+			if(newHead.equals(target)) {
+				score++;
+				Coordinate last = snake.get(snake.size() - 1).getValue();
 				snake.add(last);
-				///////////////////////////////////////////////////////////////////////////
-		}
-		// move somehow
-		
-		if (snakeDies(move)) {
-			System.out.println("Thanks for playing SnakeGame!!!");
-			// end game
-		}
+				int tRow = target.getRow();
+				int tCol = target.getCol();
+				while (tRow == target.getRow() && tCol == target.getCol()) {
+					tRow = (int)(Math.random()*board.getHeight());
+					tCol = (int)(Math.random()*board.getWidth());
+				}
+				target = new Coordinate(tRow, tCol);
+			}
 			
-		// game is not over
+			if (snakeWillDie(move, newHead)) {
+				System.out.println("Thanks for playing SnakeGame!!!");
+				gameOver = true;
+			}
+			
+			else if (move != 'q') {
+				for (int s = snake.size() - 1; s > 0; s--)
+					snake.set(s, snake.get(s - 1).getValue());
+				snake.set(0, newHead);
+			}
+		}
 	}
 	
 	/**	Print the game introduction	*/
@@ -116,33 +127,45 @@ public class SnakeGame {
 		Prompt.getString("Press enter to continue");
 	}
 	
-	/** Returns the coordinate north of a given coordinate.
+	/** Returns the coordinate north of the snake's head.
 	 *  @param coord		the given coordinate
 	 *  @return north		the coordinate north of the snake's head
 	*/
 	public Coordinate getNorth(Coordinate coord) {
-		
+		Coordinate head = snake.get(0).getValue();
+		int newR = head.getRow() - 1;
+		Coordinate newCoord = new Coordinate(newR, head.getCol());
+		return newCoord;
 	}
 	
-	/** Returns the coordinate south of a given coordinate.
+	/** Returns the coordinate south of the snake's head.
 	 *  @param coord		the given coordinate
 	 *  @return south		 the coordinate south of the snake's head */
 	public Coordinate getSouth(Coordinate coord) {
-		
+		Coordinate head = snake.get(0).getValue();
+		int newR = head.getRow() + 1;
+		Coordinate newCoord = new Coordinate(newR, head.getCol());
+		return newCoord;
 	}
 	
-	/** Returns the coordinate east of a given coordinate.
+	/** Returns the coordinate east of the snake's head.
 	 *  @param coord		the given coordinate
 	 *  @return east		 the coordinate east of the snake's head */
 	public Coordinate getEast(Coordinate coord) {
-		
+		Coordinate head = snake.get(0).getValue();
+		int newC = head.getCol() + 1;
+		Coordinate newCoord = new Coordinate(head.getRow(), newC);
+		return newCoord;
 	}
 	
-	/** Returns the coordinate west of a given coordinate.
+	/** Returns the coordinate west of the snake's head.
 	 *  @param coord		the given coordinate
 	 *  @return west		 the coordinate west of the snake's head */
 	public Coordinate getWest(Coordinate coord) {
-		
+		Coordinate head = snake.get(0).getValue();
+		int newC = head.getCol() - 1;
+		Coordinate newCoord = new Coordinate(head.getRow(), newC);
+		return newCoord;
 	}
 	
 	/** Checks if the snake dies. Snake dies if: 
@@ -153,9 +176,10 @@ public class SnakeGame {
 	 *		and / or other parts of the snake (the snake's head has
 	 * 		nowhere to go)
 	 *  @param move			user input
+	 *  @param newHead		location where the new head will go
 	 *  @return 			whether or not snake dies
 	 */
-	public boolean snakeDies(char move){
+	public boolean snakeWillDie(char move, Coordinate newHead){
 		if (move == 'q') {
 			char confirmation = Prompt.getChar("Do you really want to " + 
 				"quit? (y or n)");
@@ -163,17 +187,10 @@ public class SnakeGame {
 				return true;
 		}
 		
-		else {
-			int r = newHead.getRow();
-			int c = newHead.getCol();
-			if (r >= board.getHeight() || r < 0 || c >= board.getWidth() ||
-				c < 0)
+		else if (!isValid(newHead) || getNearbyValidSpaces() == 0 || 
+			getTotalValidSpaces() <= 5)
 				return true;
-			else if (getNearbyValidSpaces() == 0)
-				return true;
-			else if (geTotaltValidSpaces() <= 5)
-				return true;
-		}
+				
 		return false;
 	}
 	
@@ -181,7 +198,7 @@ public class SnakeGame {
 	 * 	snake's head using isValid().
 	 *  @return		number of valid spaces
 	 */
-	 public int getNearbyValidSpaces() {/////////////////////////////
+	 public int getNearbyValidSpaces() {
 		Coordinate head = snake.get(0).getValue();
 		int numSpaces = 0;
 		if (isValid(getNorth(head)))
@@ -201,14 +218,29 @@ public class SnakeGame {
 	  *  @return	whether or not space is valid
 	  */
 	 public boolean isValid(Coordinate coord) {
-		 // get row and col adn check for off grid
-		 // check for repeats in snake after the head
+		int row = coord.getRow();
+		int col = coord.getCol();
+		if (row < 0 || row >= board.getHeight() || col < 0 || col >= board.getWidth())
+			return false;
+		else {
+			for (int i = 0; i < snake.size(); i++)
+				if (snake.get(i).getValue().equals(coord))
+					return false;
+		}
+		return true;
 	 }
 	 
 	 /** Returns the total number of valid spaces on the board using isValid().
 	  *  @return	number of valid spaces on board
 	  */
 	 public int getTotalValidSpaces() {
-		 
+		 int numSpaces = 0;
+		 for (int r = 0; r < board.getHeight(); r++) {
+			 for (int c = 0; c < board.getWidth(); c++) {
+				 if (board.getChar(r, c) != '*' && board.getChar(r, c) != '@')
+					numSpaces++;
+			 }
+		 }
+		 return numSpaces;
 	 }
 }
