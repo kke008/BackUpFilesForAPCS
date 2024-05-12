@@ -1,3 +1,7 @@
+import java.util.Scanner;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 /**
  *	Snake Game - Uses singly linked lists to create the snake game. Snake
  *  	(@ for head and * for each tail segment) moves around board and eats
@@ -8,7 +12,7 @@
  *	@author	Karen Ke
  *	@since	May 7, 2024
  */
-
+ 
 public class SnakeGame {
 	
 	private Snake snake;		// the snake in the game
@@ -52,7 +56,7 @@ public class SnakeGame {
 				"d - East, a - West, h - help)";
 			char move = ' ';
 			while (move != 'w' && move != 's' && move != 'd' && move != 'a' &&
-				move != 'h' && move != 'q') {
+				move != 'h' && move != 'q' && move != 'f' && move != 'r') {
 				move = Prompt.getChar(guide);
 			 }
 			
@@ -67,6 +71,14 @@ public class SnakeGame {
 				newHead = getWest(newHead);
 			else if (move == 'h')
 				helpMenu();
+			else {
+				String fileName = "snakeGameSave.txt";
+				File f = new File(fileName);
+				if (move == 'f')
+					saveGame(fileName);
+				else if (move == 'r')
+					restoreGame(fileName);
+			}
 			
 			if(newHead.equals(target)) {
 				score++;
@@ -86,7 +98,7 @@ public class SnakeGame {
 				gameOver = true;
 			}
 			
-			else if (move != 'q') {
+			else if (move != 'q' && move != 'f' && move != 'r') {
 				for (int s = snake.size() - 1; s > 0; s--)
 					snake.set(s, snake.get(s - 1).getValue());
 				snake.set(0, newHead);
@@ -125,6 +137,46 @@ public class SnakeGame {
 							"  r - restore game from file\n" +
 							"  q - quit");
 		Prompt.getString("Press enter to continue");
+	}
+	
+	/** Saves all the coordinates of the snake in order, the location of the
+	 *  target, and the score into a file.
+	 *  @param fileName		name of file to store game info into
+	 */
+	public void saveGame(String fileName) {
+		PrintWriter writer = FileUtils.openToWrite(fileName);
+		writer.println("Snake coordinates:");
+		for (int s = 0; s < snake.size(); s++)
+			writer.println(snake.get(s).getValue());
+		writer.println("target: " + target);
+		writer.println("score: " + score);
+	}
+	
+	/** reads the file that the game was stored into and sets current game info
+	 *  accordingly
+	 *  @param fileName		name of file to read
+	 */
+	public void restoreGame(String fileName) {
+		Scanner reader = FileUtils.openToRead(fileName);
+		int i = 0;
+		String next = reader.next();
+		while(!next.equals("target")) {
+			int row = reader.nextInt();
+			int col = reader.nextInt();
+			reader.nextLine();
+			if (i < snake.size())
+				snake.set(i, new Coordinate(row, col));
+			else
+				snake.add(new Coordinate(row, col));
+			i++;
+			next = reader.next();
+		}
+		int r = reader.nextInt();
+		int c = reader.nextInt();
+		target = new Coordinate(r, c);
+		reader.nextLine();
+		int newScore = reader.nextInt();
+		score = newScore;
 	}
 	
 	/** Returns the coordinate north of the snake's head.
@@ -180,7 +232,10 @@ public class SnakeGame {
 	 *  @return 			whether or not snake dies
 	 */
 	public boolean snakeWillDie(char move, Coordinate newHead){
-		if (move == 'q') {
+		if (move == 'f' || move == 'r')
+			return false;
+			
+		else if (move == 'q') {
 			char confirmation = Prompt.getChar("Do you really want to " + 
 				"quit? (y or n)");
 			if (confirmation == 'y')
