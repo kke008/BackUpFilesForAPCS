@@ -26,7 +26,6 @@ public class SnakeBoard {
 	 * 	@param target	location of the target
 	 */
 	public void printBoard(Snake snake, Coordinate target) {
-		/*	implement here	*/
 		updateBoard(snake, target);
 		
 		printRow();
@@ -39,12 +38,6 @@ public class SnakeBoard {
 		}
 		printRow();
 	}
-	
-	/* Helper methods go here	*/
-	/** sets height of board. */
-	private void setHeight(int height) { h = height; }
-	/** sets width of board. */
-	private void setWidth(int width) { w = width; }
 	
 	/**
 	 *	Updates the values of board with the coordiantes of the snake and
@@ -81,20 +74,18 @@ public class SnakeBoard {
 		System.out.println(row);
 	}
 	
-	/*public boolean isValid(Coordinate coord) {
-		int r = coord.getRow();
-		int c = coord.getCol();
-		if (r >= 0 && r < h && c >= 0 && c < w && board[r][c] == null)
-			return true;
-		return false;
-	}
-	*/
-	
-	/*	Accessor methods	*/
 	/** returns height of board. */
 	public int getHeight() { return h; }
 	/** returns width of board. */
 	public int getWidth() { return w; }
+	
+	/** returns value at specific location board
+	 *  @param r	row of the location
+	 * 	@param c	column of the location
+	 */
+	public char getChar(int r, int c) {
+		return board[r][c];
+	}
 
 	
 	/********************************************************/
