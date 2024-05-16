@@ -32,7 +32,12 @@ public class SnakeBoard {
 		for (int r = 0; r < h; r++) {
 			System.out.print("|");
 			for (int c = 0; c < w; c++) {
-				System.out.print(board[r][c]);
+				char b = board[r][c];
+				if (b == '+' || b == '*' || b == '@')
+					System.out.print(b);
+				else
+					System.out.print(' ');
+				System.out.print(' ');
 			}
 			System.out.println("|");
 		}
@@ -68,7 +73,7 @@ public class SnakeBoard {
 	public void printRow() {
 		String row = "+";
 		for (int i = 0; i < w; i++) {
-			row += "-";
+			row += " -";
 		}
 		row += "+";
 		System.out.println(row);
