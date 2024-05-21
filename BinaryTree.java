@@ -52,7 +52,7 @@ public class BinaryTree<E extends Comparable<E>> {
 		}
 	}
 	
-	/**	Add a node to the tree
+	/**	Add a node to the tree. Calls recursive add method
 	 *	@param value		the value to put into the tree
 	 */
 /*	public void add(E value) {
@@ -72,7 +72,7 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *  @param node		the node value is being compared to
 	 *  @return			whether or not the value was added
 	 */
-	public boolean add(E val, TreeNode<E> node) {
+/*	public boolean add(E val, TreeNode<E> node) {
 		TreeNode<E> valNode = new TreeNode<E>(val);
 		
 		if (val.compareTo(node.getValue()) < 0) {
@@ -89,6 +89,7 @@ public class BinaryTree<E extends Comparable<E>> {
 		}
 		return add(val, node.getRight());
 	}
+	*/
 	
 	/**
 	 *	Print Binary Tree Inorder
