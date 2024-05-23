@@ -10,9 +10,9 @@ import java.util.List;
  *	@since	May 18, 2024
  */
  
-public class BinaryTree<E extends Comparable<E>> {
+public class BinaryTree<State extends Comparable<State>> {
 
-	private TreeNode<E> root;		// the root of the tree
+	private TreeNode<State> root;		// the root of the tree
 	
 	private final int PRINT_SPACES = 3;	// print spaces between tree levels
 										// used by printTree()
@@ -25,14 +25,14 @@ public class BinaryTree<E extends Comparable<E>> {
 	/**	Add a node to the tree
 	 *	@param value		the value to put into the tree
 	 */
-	public void add(E value) { 
-		TreeNode<E> node = new TreeNode<E>(value);
+	public void add(State value) { 
+		TreeNode<State> node = new TreeNode<State>(value);
 		if (root == null)
 			root = node;
 		
 		else {
-			TreeNode<E> prevNode = root;
-			TreeNode<E> nextNode = root;
+			TreeNode<State> prevNode = root;
+			TreeNode<State> nextNode = root;
 			boolean left = true;
 			while (nextNode != null) {
 				prevNode = nextNode;
@@ -56,10 +56,10 @@ public class BinaryTree<E extends Comparable<E>> {
 	/**	Add a node to the tree. Calls recursive add method
 	 *	@param value		the value to put into the tree
 	 */
-/*	public void add(E value) {
+/*	public void add(State value) {
 		boolean added = false;
 		if (root == null)
-			root = new TreeNode<E>(value);
+			root = new TreeNode<State>(value);
 		else
 			added = add(value, root);
 	}
@@ -73,8 +73,8 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *  @param node		the node value is being compared to
 	 *  @return			whether or not the value was added
 	 */
-/*	public boolean add(E val, TreeNode<E> node) {
-		TreeNode<E> valNode = new TreeNode<E>(val);
+/*	public boolean add(State val, TreeNode<State> node) {
+		TreeNode<State> valNode = new TreeNode<State>(val);
 		
 		if (val.compareTo(node.getValue()) < 0) {
 			if (node.getLeft() == null) {
@@ -96,8 +96,8 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	Print Binary Tree Inorder
 	 */
 	public void printInorder() {		// left, node, right
-		List<TreeNode<E>> list = new ArrayList<TreeNode<E>>();
-		TreeNode<E> node = root;
+		List<TreeNode<State>> list = new ArrayList<TreeNode<State>>();
+		TreeNode<State> node = root;
 		
 		while (list.size() > 0 || node != null) {
 			while (node != null) {		// keep going left
@@ -119,8 +119,8 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	Print Binary Tree Preorder
 	 */
 	public void printPreorder() { 		// node, left, right
-		TreeNode<E> node = root;
-		List<TreeNode<E>> list = new ArrayList<TreeNode<E>>();
+		TreeNode<State> node = root;
+		List<TreeNode<State>> list = new ArrayList<TreeNode<State>>();
 		
 		while (list.size() > 0 || node != null) {
 			while (node != null) {
@@ -142,9 +142,9 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	Print Binary Tree Postorder
 	 */
 	public void printPostorder() { 		//left, right, node	
-		List<TreeNode<E>> list = new ArrayList<TreeNode<E>>();
-		TreeNode<E> node = root;
-		TreeNode<E> lastNode = null;
+		List<TreeNode<State>> list = new ArrayList<TreeNode<State>>();
+		TreeNode<State> node = root;
+		TreeNode<State> lastNode = null;
 		
 		while (list.size() > 0 || node != null) {
 			while (node != null) {
@@ -169,9 +169,9 @@ public class BinaryTree<E extends Comparable<E>> {
 	/**	Return a balanced version of this binary tree
 	 *	@return		the balanced tree
 	 */
-	public BinaryTree<E> makeBalancedTree() {
-		BinaryTree<E> balancedTree = new BinaryTree<E>();
-		List<TreeNode<E>> nodes = orderNodes();
+	public BinaryTree<State> makeBalancedTree() {
+		BinaryTree<State> balancedTree = new BinaryTree<State>();
+		List<TreeNode<State>> nodes = orderNodes();
 		addToBalTree(balancedTree, nodes);
 		return balancedTree;
 	}
@@ -180,10 +180,10 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *  Uses the printInorder process except adds to array instead of prints.
 	 *  @return		the array list of values
 	 */
-	public List<TreeNode<E>> orderNodes() {
-		List<TreeNode<E>> orderedNodes = new ArrayList<TreeNode<E>>();
-		List<TreeNode<E>> list = new ArrayList<TreeNode<E>>();
-		TreeNode<E> node = root;
+	public List<TreeNode<State>> orderNodes() {
+		List<TreeNode<State>> orderedNodes = new ArrayList<TreeNode<State>>();
+		List<TreeNode<State>> list = new ArrayList<TreeNode<State>>();
+		TreeNode<State> node = root;
 		
 		while (list.size() > 0 || node != null) {
 			while (node != null) {
@@ -209,7 +209,7 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *  @param tree		balenced tree to add values to
 	 *  @param nodes	ArrayList of values
 	 */
-	public void addToBalTree (BinaryTree<E> tree, List<TreeNode<E>> nodes) {
+	public void addToBalTree (BinaryTree<State> tree, List<TreeNode<State>> nodes) {
 		if (nodes.size() == 1)
 			tree.add(nodes.get(0).getValue());
 			
@@ -217,7 +217,7 @@ public class BinaryTree<E extends Comparable<E>> {
 			int mid = (nodes.size() - 1) / 2;
 			tree.add(nodes.get(mid).getValue());
 			
-			List<TreeNode<E>> half1 = new ArrayList<TreeNode<E>>();
+			List<TreeNode<State>> half1 = new ArrayList<TreeNode<State>>();
 			if (mid > 0) {
 				for (int i = 0; i < mid; i++)
 					half1.add(nodes.get(i));
@@ -225,7 +225,7 @@ public class BinaryTree<E extends Comparable<E>> {
 			}
 			
 			if (mid < nodes.size() - 1) {
-				List<TreeNode<E>> half2 = new ArrayList<TreeNode<E>>();
+				List<TreeNode<State>> half2 = new ArrayList<TreeNode<State>>();
 				for (int j = mid + 1; j < nodes.size(); j++)
 					half2.add(nodes.get(j));
 				addToBalTree(tree, half2);
@@ -238,7 +238,7 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	@param value		the value to remove from the tree
 	 *	Precondition: value exists in the tree
 	 */
-	public void remove(E value) {
+	public void remove(State value) {
 		root = remove(root, value);
 	}
 	/**
@@ -247,9 +247,9 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	@param value		the value to remove from the subtree
 	 *	@return				TreeNode that connects to parent
 	 */
-	public TreeNode<E> remove(TreeNode<E> node, E value) {
-		TreeNode<E> parent = getValParent(node, value);
-		TreeNode<E> valNode = null;
+	public TreeNode<State> remove(TreeNode<State> node, State value) {
+		TreeNode<State> parent = getValParent(node, value);
+		TreeNode<State> valNode = null;
 		boolean valIsLeft = false;
 		
 		if (parent == null) 
@@ -283,7 +283,7 @@ public class BinaryTree<E extends Comparable<E>> {
 		}
 		// case 3:
 		else {
-			TreeNode<E> rightNode = valNode.getRight();
+			TreeNode<State> rightNode = valNode.getRight();
 			if (rightNode.getLeft() == null) {
 				rightNode.setLeft(valNode.getLeft());
 				if (parent == null)
@@ -295,12 +295,12 @@ public class BinaryTree<E extends Comparable<E>> {
 			}
 			
 			else {
-				TreeNode<E> nextSmallest = rightNode;
+				TreeNode<State> nextSmallest = rightNode;
 				while (nextSmallest.getLeft() != null)
 					nextSmallest = nextSmallest.getLeft();
-				E nextVal = nextSmallest.getValue();
+				State nextVal = nextSmallest.getValue();
 				remove(nextVal);
-				nextSmallest = new TreeNode<E>(nextVal);
+				nextSmallest = new TreeNode<State>(nextVal);
 				
 				nextSmallest.setLeft(valNode.getLeft());
 				nextSmallest.setRight(valNode.getRight());
@@ -320,8 +320,8 @@ public class BinaryTree<E extends Comparable<E>> {
 	 * 	@param val		given value
 	 * 	@return parent	parent node
 	 */
-	public TreeNode<E> getValParent(TreeNode<E> node, E val) {
-		TreeNode<E> parent = null;
+	public TreeNode<State> getValParent(TreeNode<State> node, State val) {
+		TreeNode<State> parent = null;
 		
 		if (node.getLeft() != null && node.getLeft().getValue().equals(val) || 
 			node.getRight() != null && node.getRight().getValue().equals(val))
@@ -344,7 +344,7 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *  space, then setting the orignal string equal to the substring of
 	 *  the original string from the index after the index of the last space
 	 */
-	public void loadData() {	////////////////////////////////////////////////////////////
+	/*public void loadData() {	////////////////////////////////////////////////////////////
 		Scanner reader = FileUtils.openToRead("states2.txt");
 		while (reader.hasNext()) {
 			String line = reader.nextLine();
@@ -368,10 +368,11 @@ public class BinaryTree<E extends Comparable<E>> {
 			line = line.substring(line.indexOf(' ') + 1);
 			int y = Integer.parseInt(line);
 			
-			State state = new State(n, a, p, ar, r, c, m , d, y);
-			add(state);
+			//State state = new State(n, a, p, ar, r, c, m , d, y);
+			add(new State(n, a, p, ar, r, c, m , d, y));
 		}
 	}
+	*/
 	
 	/** Removes all excess spaces in a string so that each space is only 
 	 *  character long.
@@ -397,17 +398,21 @@ public class BinaryTree<E extends Comparable<E>> {
 		
 	}
 	
-	/** Prints the tree in ascending order by state name
+	/** Prints the tree in ascending order by state name (inorder)
 	 */
 	public void printList() {	////////////////////////////////////////////////////////////
-		
+		printInorder();
+		System.out.println();
 	}
 	
 	/** Prompts the user for the state name and prints that state's
 	 *  information
 	 */
 	public void testFind() {	////////////////////////////////////////////////////////////
-		
+		String name = Prompt.getString("Testing search algorithm\nEnter" +
+			" state name to search for (Q to quit)");
+		TreeNode<StateS	>	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		while (
 	}
 	
 	/** @return		number of nodes in tree */
@@ -480,7 +485,7 @@ public class BinaryTree<E extends Comparable<E>> {
 	 *	@param node		root of subtree
 	 *	@param level	level down from root (root level = 0)
 	 */
-	private void printLevel(TreeNode<E> node, int level) {
+	private void printLevel(TreeNode<State> node, int level) {
 		if (node == null) return;
 		// print right subtree
 		printLevel(node.getRight(), level + 1);
