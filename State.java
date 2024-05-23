@@ -62,12 +62,12 @@ public class State implements Comparable<State>
 	}
 	
 	/** adds spaces to the state string
-	 * 	@param		number of spaces to add
+	 * 	@param numSpaces		number of spaces to add
 	 *  @return		new state string with the name
 	 */
-	public String addSpaces (int spaces) {
+	public String addSpaces (int numSpaces) {
 		String spaces = "";
-		for (int i = 0; i < spaces; i++) {
+		for (int i = 0; i < numSpaces; i++) {
 			spaces += " ";			
 		}
 	}
