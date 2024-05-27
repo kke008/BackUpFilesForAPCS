@@ -408,13 +408,13 @@ public class BinaryTree<State extends Comparable<State>> {
 	/** Prompts the user for the state name and prints that state's
 	 *  information
 	 */
-	public void testFind() {	////////////////////////////////////////////////////////////
+/*	public void testFind() {	////////////////////////////////////////////////////////////
 		String name = Prompt.getString("Testing search algorithm\nEnter" +
 			" state name to search for (Q to quit)");
 		TreeNode<State> node = root;
 		String nodeName = node.getValue().getName();
 		while (node != null && nodeName.equals(name) == false) {
-			if (nodeName.compareTO(name) < 0)
+			if (nodeName.compareTo(name) < 0)
 				node = node.getLeft();
 			else
 				node = node.getRight();
@@ -423,6 +423,7 @@ public class BinaryTree<State extends Comparable<State>> {
 		}
 		System.out.println(node.getValue().toString());
 	}
+	*/
 	
 	/** @return		number of nodes in tree */
 	public int size() {	////////////////////////////////////////////////////////////
@@ -441,8 +442,32 @@ public class BinaryTree<State extends Comparable<State>> {
 	 * 	all states at that level
 	 *  @param lvl		level of tree to get states at
 	 */
-	public void printLevel() {	////////////////////////////////////////////////////////////
-		int level = Prompt.getInt(
+	/*public void printLevel() {	////////////////////////////////////////////////////////////
+		int level = Prompt.getInt("Enter level value to print (-1 to quit)-");
+		List<String> names = new ArrayList<String>();
+		getLevel(0, root, level, names);
+		for (int i = 0; i < names.size(); i++) {
+			System.out.println(names.get(i) + " ");
+		}
+	}
+	
+	/** If level of the current node is the one the user wants, adds the node name
+	 *  to the list. Otherwise, calls itself for any nodes on the left or right 
+	 * 	until it reaches the level the user is looking for.
+	 *  @param current		level of the current node
+	 *  @param node			current nodde
+	 *  @param goal			level user wants
+	 *  @param names		list to add names to
+	 */
+/*	public void getLevel(int current, TreeNode<State> node, int goal, List<String> names) {
+		if (current == goal)
+			names += node.getValue().getName();
+		else if (current < goal) {
+			if (node.getLeft() != null)
+				getLevel(current + 1, node.getLeft(), goal, names);
+			if (node.getRight() != null)
+				getLevel(current + 1, node.getRight(), goal, names);
+		}
 	}
 	
 	/** Prints the depth (highest level number) of the tree to print. Level
@@ -451,12 +476,48 @@ public class BinaryTree<State extends Comparable<State>> {
 	public void testDepth() {	////////////////////////////////////////////////////////////
 		if (size() == 0)
 			System.out.println("is empty");
+		else {
+			int lvl = getDepth(root, 0);
+			System.out.println("Depth: " + lvl);
+		}
+	}
+	
+	/** Returns the depth of the tree by getting the max level of the branches.
+	 *  If the current node is a leaf, returns the level of the node. If the node
+	 *  only has one child, returns the max level of that child's branch. Otherwise
+	 *  returns the greater value between the max level of either child's branch.
+	 *  @param node		current node
+	 *  @param level	level of current node
+	 * 	@return 		max level of branch / tree
+	 */
+	public int getDepth(TreeNode<State> node, int level) {
+		int leftLvl = level;
+		int rightLvl = level;
+		if (node.getLeft() != null)
+			leftLvl = getDepth(node.getLeft(), level + 1);
+		if (node.getRight() != null)
+			rightLvl = getDepth(node.getRight(), level + 1);
+		if (leftLvl >= rightLvl)
+			return leftLvl;
+		return rightLvl;
 	}
 	
 	/** Prompts the user for a state name and deletes that state's node
 	 */
-	public void testDelete() {	////////////////////////////////////////////////////////////
-		
+/*	public void testDelete() {	////////////////////////////////////////////////////////////
+		String name = Prompt.getString("Testing search algorithm\nEnter" +
+			" state name to search for (Q to quit)");
+		TreeNode<State> node = root;
+		String nodeName = node.getValue().getName();
+		while (node != null && nodeName.equals(name) == false) {
+			if (nodeName.compareTo(name) < 0)
+				node = node.getLeft();
+			else
+				node = node.getRight();
+			if (node != null)
+				nodeName = node.getValue().getName();
+		}
+		remove(node.getValue());
 	}
 	
 	
@@ -508,5 +569,29 @@ public class BinaryTree<State extends Comparable<State>> {
 		printLevel(node.getLeft(), level + 1);
 	}
 	
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public static void main(String[] args) {
+		BinaryTree bt = new BinaryTree();
+		bt.run();
+	}
+	
+	public void run() {
+		State s1 = new State("G", "g", 700, 0, 2, "GG", 0, 1, 2);
+		add(s1);
+		State s2 = new State("B", "b", 200, 0, 2, "BB", 0, 1, 2);
+		add(s2);
+		State s3 = new State("C", "c", 300, 0, 2, "CC", 0, 1, 2);
+		add(s3);
+		State s4 = new State("F", "f", 600, 0, 2, "FF", 0, 1, 2);
+		add(s4);
+		State s5 = new State("D", "d", 400, 0, 2, "FF", 0, 1, 2);
+		add(s5);
+		State s6 = new State("E", "e", 500, 0, 2, "EE", 0, 1, 2);
+		add(s6);
+		State s7 = new State("A", "a", 100, 0, 2, "AA", 0, 1, 2);
+		add(s7);
+		
+		printList();
+	}
 	
 }
