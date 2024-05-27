@@ -411,8 +411,17 @@ public class BinaryTree<State extends Comparable<State>> {
 	public void testFind() {	////////////////////////////////////////////////////////////
 		String name = Prompt.getString("Testing search algorithm\nEnter" +
 			" state name to search for (Q to quit)");
-		TreeNode<StateS	>	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		while (
+		TreeNode<State> node = root;
+		String nodeName = node.getValue().getName();
+		while (node != null && nodeName.equals(name) == false) {
+			if (nodeName.compareTO(name) < 0)
+				node = node.getLeft();
+			else
+				node = node.getRight();
+			if (node != null)
+				nodeName = node.getValue().getName();
+		}
+		System.out.println(node.getValue());
 	}
 	
 	/** @return		number of nodes in tree */
