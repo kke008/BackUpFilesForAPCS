@@ -395,7 +395,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	 * 	@param next		State tat will be inserted
 	 */
 	public void insert(State next) {	////////////////////////////////////////////////////////////
-		
+		add(next);	// ???
 	}
 	
 	/** Prints the tree in ascending order by state name (inorder)
@@ -421,16 +421,19 @@ public class BinaryTree<State extends Comparable<State>> {
 			if (node != null)
 				nodeName = node.getValue().getName();
 		}
-		System.out.println(node.getValue());
+		System.out.println(node.getValue().toString());
 	}
 	
 	/** @return		number of nodes in tree */
 	public int size() {	////////////////////////////////////////////////////////////
-		return 1;
+		List<TreeNode<State>> states = orderNodes();
+		return states.size();
 	}
 	
 	/** clears tree of all nodes */
 	public void clear() {
+		root.setLeft(null);
+		root.setRight(null);
 		root = null;
 	}
 	
@@ -439,7 +442,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	 *  @param lvl		level of tree to get states at
 	 */
 	public void printLevel() {	////////////////////////////////////////////////////////////
-		
+		int level = Prompt.getInt(
 	}
 	
 	/** Prints the depth (highest level number) of the tree to print. Level
