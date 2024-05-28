@@ -70,5 +70,6 @@ public class State implements Comparable<State>
 		for (int i = 0; i < numSpaces; i++) {
 			spaces += " ";			
 		}
+		return spaces;
 	}
 }
