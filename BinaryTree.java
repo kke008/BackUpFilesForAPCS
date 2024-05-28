@@ -1,6 +1,9 @@
 import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
+import java.io.PrintWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  *	Binary Tree of Comparable values.
@@ -10,7 +13,7 @@ import java.util.List;
  *	@since	May 18, 2024
  */
  
-public class BinaryTree<State extends Comparable<State>> {
+public class BinaryTree {
 
 	private TreeNode<State> root;		// the root of the tree
 	
@@ -108,7 +111,7 @@ public class BinaryTree<State extends Comparable<State>> {
 			do {
 				node = list.get(list.size() - 1);	// revisiting
 				list.remove(list.size() - 1);
-				System.out.print(node.getValue() + " ");	// if no right tree,
+				System.out.print(node.getValue() + "\n");	// if no right tree,
 			} while (node.getRight() == null && list.size() > 0);	// print parent
 			
 			node = node.getRight();
@@ -169,8 +172,8 @@ public class BinaryTree<State extends Comparable<State>> {
 	/**	Return a balanced version of this binary tree
 	 *	@return		the balanced tree
 	 */
-	public BinaryTree<State> makeBalancedTree() {
-		BinaryTree<State> balancedTree = new BinaryTree<State>();
+	public BinaryTree makeBalancedTree() {
+		BinaryTree balancedTree = new BinaryTree();
 		List<TreeNode<State>> nodes = orderNodes();
 		addToBalTree(balancedTree, nodes);
 		return balancedTree;
@@ -209,7 +212,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	 *  @param tree		balenced tree to add values to
 	 *  @param nodes	ArrayList of values
 	 */
-	public void addToBalTree (BinaryTree<State> tree, List<TreeNode<State>> nodes) {
+	public void addToBalTree (BinaryTree tree, List<TreeNode<State>> nodes) {
 		if (nodes.size() == 1)
 			tree.add(nodes.get(0).getValue());
 			
@@ -344,8 +347,10 @@ public class BinaryTree<State extends Comparable<State>> {
 	 *  space, then setting the orignal string equal to the substring of
 	 *  the original string from the index after the index of the last space
 	 */
-	/*public void loadData() {	////////////////////////////////////////////////////////////
-		Scanner reader = FileUtils.openToRead("states2.txt");
+	public void loadData() {
+		String fileName = "states2.txt";
+		System.out.println("Loading file " + fileName + "\n");
+		Scanner reader = FileUtils.openToRead(fileName);
 		while (reader.hasNext()) {
 			String line = reader.nextLine();
 			line = removeExcessSpaces(line);
@@ -369,10 +374,10 @@ public class BinaryTree<State extends Comparable<State>> {
 			int y = Integer.parseInt(line);
 			
 			//State state = new State(n, a, p, ar, r, c, m , d, y);
-			add(new State(n, a, p, ar, r, c, m , d, y));
+			State temp = new State(n, a, p, ar, r, c, m , d, y);
+			add(temp);
 		}
 	}
-	*/
 	
 	/** Removes all excess spaces in a string so that each space is only 
 	 *  character long.
@@ -392,7 +397,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	
 	/** Inserts a new State object into the binary tree. States are compared
 	 *  by their names
-	 * 	@param next		State tat will be inserted
+	 * 	@param next		State that will be inserted
 	 */
 	public void insert(State next) {	////////////////////////////////////////////////////////////
 		add(next);	// ???
@@ -400,7 +405,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	
 	/** Prints the tree in ascending order by state name (inorder)
 	 */
-	public void printList() {	////////////////////////////////////////////////////////////
+	public void printList() {
 		printInorder();
 		System.out.println();
 	}
@@ -408,25 +413,62 @@ public class BinaryTree<State extends Comparable<State>> {
 	/** Prompts the user for the state name and prints that state's
 	 *  information
 	 */
-/*	public void testFind() {	////////////////////////////////////////////////////////////
-		String name = Prompt.getString("Testing search algorithm\nEnter" +
-			" state name to search for (Q to quit)");
-		TreeNode<State> node = root;
-		String nodeName = node.getValue().getName();
-		while (node != null && nodeName.equals(name) == false) {
-			if (nodeName.compareTo(name) < 0)
-				node = node.getLeft();
-			else
-				node = node.getRight();
+	public void testFind() {
+		System.out.println("Testing search algorithm\n");
+		String name = Prompt.getString("Enter state name to search for" + 
+			" (Q to quit)");
+		while (name.equalsIgnoreCase("q") == false) {
+			name = changeCase(name);
+			TreeNode<State> node = root;
+			String nodeName = node.getValue().getName();
+			while (node != null && nodeName.equalsIgnoreCase(name) == false) {
+				if (name.compareTo(nodeName) < 0)
+					node = node.getLeft();
+				else if (name.compareTo(nodeName) > 0)
+					node = node.getRight();
+				if (node != null)
+					nodeName = node.getValue().getName();
+			}
 			if (node != null)
-				nodeName = node.getValue().getName();
+				System.out.println("\n" + node.getValue().toString() + "\n");
+			else
+				System.out.println("Name = " + name + "  No such state name\n");
+			
+			name = Prompt.getString("Enter state name to search for" + 
+				" (Q to quit)");
 		}
-		System.out.println(node.getValue().toString());
 	}
-	*/
+	
+	/** Changes the case of a string so that the first letter is capital
+	 *  and the rest are lowercase.
+	 *  @param str		string to change
+	 *  @return newStr	changed string
+	 */
+	public String changeCase(String str) {
+		String newStr = "";
+		newStr += getNewChar(str.substring(0, 1), 0);
+		for (int i = 1; i < str.length(); i++)
+			newStr += getNewChar(str.substring(i, i + 1), 1);
+		return newStr;
+	}
+	
+	/** Returns the uppercase or lowercase version of a given letter
+	 * 	@param s			the letter
+	 *  @param caseNum		0 if want uppercase, 1 if want lowercase
+	 * 	@return				modified letter
+	 */
+	public String getNewChar(String s, int caseNum) {
+		int start = 65 + 32 * caseNum;
+		for (int i = start; i < start + 26; i++) {
+			String newS = "" + (char)i;
+			if (s.equalsIgnoreCase(newS))
+				return newS;
+		}
+		return "";
+	}
 	
 	/** @return		number of nodes in tree */
-	public int size() {	////////////////////////////////////////////////////////////
+	public int size() {
 		List<TreeNode<State>> states = orderNodes();
 		return states.size();
 	}
@@ -442,13 +484,25 @@ public class BinaryTree<State extends Comparable<State>> {
 	 * 	all states at that level
 	 *  @param lvl		level of tree to get states at
 	 */
-	/*public void printLevel() {	////////////////////////////////////////////////////////////
-		int level = Prompt.getInt("Enter level value to print (-1 to quit)-");
-		List<String> names = new ArrayList<String>();
-		getLevel(0, root, level, names);
-		for (int i = 0; i < names.size(); i++) {
-			System.out.println(names.get(i) + " ");
+	public void printLevel() {
+		System.out.println("Testing printLevel algorithm\n");
+		int level = Prompt.getInt("Enter level value to print (-1 to quit)");;
+		while (level != -1) {
+			List<String> names = new ArrayList<String>();
+			getLevel(0, root, level, names);
+			System.out.println("\nLevel\t" + level);
+			for (int i = 0; i < names.size(); i++) {
+				if (i == 7)
+					System.out.println();
+				String name = names.get(i);
+				System.out.printf("%-12s", name);
+				if (name.length() >= 12)
+					System.out.print("\t");
+			}
+			System.out.println("\n");
+			level = Prompt.getInt("Enter level value to print (-1 to quit)");
 		}
+		System.out.println("\n");
 	}
 	
 	/** If level of the current node is the one the user wants, adds the node name
@@ -459,9 +513,9 @@ public class BinaryTree<State extends Comparable<State>> {
 	 *  @param goal			level user wants
 	 *  @param names		list to add names to
 	 */
-/*	public void getLevel(int current, TreeNode<State> node, int goal, List<String> names) {
+	public void getLevel(int current, TreeNode<State> node, int goal, List<String> names) {
 		if (current == goal)
-			names += node.getValue().getName();
+			names.add(node.getValue().getName());
 		else if (current < goal) {
 			if (node.getLeft() != null)
 				getLevel(current + 1, node.getLeft(), goal, names);
@@ -473,12 +527,12 @@ public class BinaryTree<State extends Comparable<State>> {
 	/** Prints the depth (highest level number) of the tree to print. Level
 	 * 	of root is 0. If tree has no nodes, prints "is empty"
 	 */
-	public void testDepth() {	////////////////////////////////////////////////////////////
+	public void testDepth() {
 		if (size() == 0)
 			System.out.println("is empty");
 		else {
 			int lvl = getDepth(root, 0);
-			System.out.println("Depth: " + lvl);
+			System.out.println("Depth of the tree = " + lvl + "\n");
 		}
 	}
 	
@@ -504,7 +558,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	
 	/** Prompts the user for a state name and deletes that state's node
 	 */
-/*	public void testDelete() {	////////////////////////////////////////////////////////////
+	public void testDelete() {	////////////////////////////////////////////////////////////
 		String name = Prompt.getString("Testing search algorithm\nEnter" +
 			" state name to search for (Q to quit)");
 		TreeNode<State> node = root;
@@ -570,7 +624,7 @@ public class BinaryTree<State extends Comparable<State>> {
 	}
 	
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static void main(String[] args) {
+/*	public static void main(String[] args) {
 		BinaryTree bt = new BinaryTree();
 		bt.run();
 	}
@@ -593,5 +647,6 @@ public class BinaryTree<State extends Comparable<State>> {
 		
 		printList();
 	}
+	*/
 	
 }
