@@ -38,9 +38,9 @@ public class StateTree
 			{
 				switch (choice.charAt(0))
 				{
-					//case '1' :	
-					//	tree.loadData();		
-						//break;
+					case '1' :	
+						tree.loadData();		
+						break;
 					case '2' :
 						System.out.println();
 						System.out.println("The tree printed inorder\n");
@@ -68,7 +68,6 @@ public class StateTree
 						break;
 				}
 			}
-		}
-		while (choice.charAt(0) != 'Q' && choice.charAt(0) != 'q');
+		}while (choice.charAt(0) != 'Q' && choice.charAt(0) != 'q');
 	}
 }
