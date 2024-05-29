@@ -373,9 +373,7 @@ public class BinaryTree {
 			line = line.substring(line.indexOf(' ') + 1);
 			int y = Integer.parseInt(line);
 			
-			//State state = new State(n, a, p, ar, r, c, m , d, y);
-			State temp = new State(n, a, p, ar, r, c, m , d, y);
-			add(temp);
+			add(new State(n, a, p, ar, r, c, m , d, y));
 		}
 	}
 	
@@ -464,7 +462,7 @@ public class BinaryTree {
 			if (s.equalsIgnoreCase(newS))
 				return newS;
 		}
-		return "";
+		return s;
 	}
 	
 	/** @return		number of nodes in tree */
@@ -486,14 +484,14 @@ public class BinaryTree {
 	 */
 	public void printLevel() {
 		System.out.println("Testing printLevel algorithm\n");
-		int level = Prompt.getInt("Enter level value to print (-1 to quit)");;
+		int level = Prompt.getInt("Enter level value to print (-1 to quit)");
+		if (level > getDepth(root, 0))
+			System.out.println("Level = " + level + " No such level");
 		while (level != -1) {
 			List<String> names = new ArrayList<String>();
 			getLevel(0, root, level, names);
 			System.out.println("\nLevel\t" + level);
 			for (int i = 0; i < names.size(); i++) {
-				if (i == 7)
-					System.out.println();
 				String name = names.get(i);
 				System.out.printf("%-12s", name);
 				if (name.length() >= 12)
@@ -556,22 +554,32 @@ public class BinaryTree {
 		return rightLvl;
 	}
 	
-	/** Prompts the user for a state name and deletes that state's node
+	/** Prompts the user for a state name and deletes that state's node, if the
+	 *  state exists. Finds node by changing the user's input using changeCase().
 	 */
-	public void testDelete() {	////////////////////////////////////////////////////////////
-		String name = Prompt.getString("Testing search algorithm\nEnter" +
-			" state name to search for (Q to quit)");
-		TreeNode<State> node = root;
-		String nodeName = node.getValue().getName();
-		while (node != null && nodeName.equals(name) == false) {
-			if (nodeName.compareTo(name) < 0)
-				node = node.getLeft();
-			else
-				node = node.getRight();
-			if (node != null)
-				nodeName = node.getValue().getName();
+	public void testDelete() {
+		System.out.println("Testing delete algorithm\n");
+		String name = Prompt.getString("Enter state name to delete (Q to quit)");
+		while (name.equalsIgnoreCase("q") == false) {
+			name = changeCase(name);
+			TreeNode<State> node = root;
+			String nodeName = node.getValue().getName();
+			while (node != null && nodeName.equals(name) == false) {
+				if (name.compareTo(nodeName) < 0)
+					node = node.getLeft();
+				else if (name.compareTo(nodeName) > 0)
+					node = node.getRight();
+				if (node != null)
+					nodeName = node.getValue().getName();
+			}
+			if (node == null)
+				System.out.println("Name = " + name + "  No such state name\n");
+			else {
+				remove(node.getValue());
+				System.out.println("\nDeleted " + name + "\n");
+			}
+			name = Prompt.getString("Enter state name to delete (Q to quit)");
 		}
-		remove(node.getValue());
 	}
 	
 	
@@ -621,32 +629,5 @@ public class BinaryTree {
 		System.out.println(node.getValue());
 		// print left subtree
 		printLevel(node.getLeft(), level + 1);
-	}
-	
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*	public static void main(String[] args) {
-		BinaryTree bt = new BinaryTree();
-		bt.run();
-	}
-	
-	public void run() {
-		State s1 = new State("G", "g", 700, 0, 2, "GG", 0, 1, 2);
-		add(s1);
-		State s2 = new State("B", "b", 200, 0, 2, "BB", 0, 1, 2);
-		add(s2);
-		State s3 = new State("C", "c", 300, 0, 2, "CC", 0, 1, 2);
-		add(s3);
-		State s4 = new State("F", "f", 600, 0, 2, "FF", 0, 1, 2);
-		add(s4);
-		State s5 = new State("D", "d", 400, 0, 2, "FF", 0, 1, 2);
-		add(s5);
-		State s6 = new State("E", "e", 500, 0, 2, "EE", 0, 1, 2);
-		add(s6);
-		State s7 = new State("A", "a", 100, 0, 2, "AA", 0, 1, 2);
-		add(s7);
-		
-		printList();
-	}
-	*/
-	
+	}	
 }
