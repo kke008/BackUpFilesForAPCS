@@ -408,6 +408,24 @@ public class BinaryTree {
 		System.out.println();
 	}
 	
+	/** Calls recursive print list method
+	 */
+/*	public void printList() {
+		recursivePrint(root);
+	}
+	
+	/** recurstive print list method
+	 *  @param node		current node
+	 */
+/*	public void recursivePrint(TreeNode<State> node) {
+		if (node.getLeft() != null)
+			recursivePrint(node.getLeft());
+		System.out.print(node.getValue() + "\n");
+		if (node.getRight() != null) 
+			recursivePrint(node.getRight());
+	}
+	*/
+	
 	/** Prompts the user for the state name and prints that state's
 	 *  information
 	 */
@@ -436,6 +454,38 @@ public class BinaryTree {
 				" (Q to quit)");
 		}
 	}
+	
+	/** Calls recursive test find
+	 */
+/*	public void testFind() {
+		System.out.println("Testing search algorithm\n");
+		String name = Prompt.getString("Enter state name to search for" + 
+			" (Q to quit)");
+		while (name.equalsIgnoreCase("q") == false) {
+			name = changeCase(name);
+			findState(root, name);
+			name = Prompt.getString("Enter state name to search for" + 
+				" (Q to quit)");
+		}
+	}
+	*/
+	
+	/** Recursive test find
+	 *  @param node		current node
+	 *  @param name		name of state to find
+	 */
+/*	public void findState(TreeNode<State> node, String name) {
+		if (node == null)
+			System.out.println("Name = " + name + "  No such state name\n");
+		else if (node.getValue().getName().equals(name))
+			System.out.println("\n" + node.getValue().toString() + "\n");
+			
+		else if (node.getValue().getName().compareTo(name) < 0)
+			findState(node.getRight(), name);
+		else if (node.getValue().getName().compareTo(name) > 0)
+			findState(node.getLeft(), name);
+	}
+	*/
 	
 	/** Changes the case of a string so that the first letter is capital
 	 *  and the rest are lowercase.
@@ -557,7 +607,7 @@ public class BinaryTree {
 	/** Prompts the user for a state name and deletes that state's node, if the
 	 *  state exists. Finds node by changing the user's input using changeCase().
 	 */
-	public void testDelete() {
+	public void testDelete() {	////////////////////////////////////////////////////////////
 		System.out.println("Testing delete algorithm\n");
 		String name = Prompt.getString("Enter state name to delete (Q to quit)");
 		while (name.equalsIgnoreCase("q") == false) {
