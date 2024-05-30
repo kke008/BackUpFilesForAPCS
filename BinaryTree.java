@@ -521,6 +521,25 @@ public class BinaryTree {
 		return states.size();
 	}
 	
+	/** calls recursive method to get size of tree
+	 *  @return 	size of tree
+	 */
+/*	public int size() {
+		return countNodes(root);
+	}
+	*/
+	
+	/** recursively counts number of nodes in tree
+	 *  @param		node to count
+	 *  @return		number of nodes in tree
+	 */
+/*	public int countNodes(TreeNode<State> node) {
+		if (node == null)
+			return 0;
+		return 1 + countNodes(node.getLeft()) + countNodes(node.getRight());
+	}
+	*/
+	
 	/** clears tree of all nodes */
 	public void clear() {
 		root.setLeft(null);
@@ -530,19 +549,29 @@ public class BinaryTree {
 	
 	/** Prompts the user for a level of the tree and prints the names of
 	 * 	all states at that level
-	 *  @param lvl		level of tree to get states at
 	 */
 	public void printLevel() {
 		System.out.println("Testing printLevel algorithm\n");
 		int level = Prompt.getInt("Enter level value to print (-1 to quit)");
-		if (level > getDepth(root, 0))
-			System.out.println("Level = " + level + " No such level");
 		while (level != -1) {
-			List<String> names = new ArrayList<String>();
-			getLevel(0, root, level, names);
+			List<TreeNode<State>> lastLevel = new ArrayList<TreeNode<State>>();
+			lastLevel.add(root);
+			int current = 0;
+			while (current < level) {
+				List<TreeNode<State>> newLevel = new ArrayList<TreeNode<State>>();
+				for (int j = 0; j < lastLevel.size(); j++) {
+					TreeNode<State> node = lastLevel.get(j);
+					if (node.getLeft() != null)
+						newLevel.add(node.getLeft());
+					if (node.getRight() != null)
+						newLevel.add(node.getRight());
+				}
+				lastLevel = newLevel;
+				current++;
+			}
 			System.out.println("\nLevel\t" + level);
-			for (int i = 0; i < names.size(); i++) {
-				String name = names.get(i);
+			for (int i = 0; i < lastLevel.size(); i++) {
+				String name = lastLevel.get(i).getValue().getName();
 				System.out.printf("%-12s", name);
 				if (name.length() >= 12)
 					System.out.print("\t");
@@ -553,24 +582,41 @@ public class BinaryTree {
 		System.out.println("\n");
 	}
 	
+	/** Calls recursive print level
+	 */
+/*	public void printLevel() {
+		System.out.println("Testing printLevel algorithm\n");
+		int level = Prompt.getInt("Enter level value to print (-1 to quit)");
+		while (level != -1) {
+			System.out.println("\nLevel\t" + level);
+			getLevel(root, 0, level);
+			System.out.println("\n");
+			level = Prompt.getInt("Enter level value to print (-1 to quit)");
+		}
+		System.out.println("\n");
+	}
+	*/
+	
 	/** If level of the current node is the one the user wants, adds the node name
 	 *  to the list. Otherwise, calls itself for any nodes on the left or right 
 	 * 	until it reaches the level the user is looking for.
+	 *  @param node			current node
 	 *  @param current		level of the current node
-	 *  @param node			current nodde
 	 *  @param goal			level user wants
-	 *  @param names		list to add names to
 	 */
-	public void getLevel(int current, TreeNode<State> node, int goal, List<String> names) {
+/*	public void getLevel(TreeNode<State> node, int current, int goal) {
 		if (current == goal)
-			names.add(node.getValue().getName());
+			System.out.print(node.getValue().getName() + "\t");
+			
 		else if (current < goal) {
+			current++;
 			if (node.getLeft() != null)
-				getLevel(current + 1, node.getLeft(), goal, names);
+				getLevel(node.getLeft(), current, goal);
 			if (node.getRight() != null)
-				getLevel(current + 1, node.getRight(), goal, names);
+				getLevel(node.getRight(), current, goal);
 		}
 	}
+	*/
 	
 	/** Prints the depth (highest level number) of the tree to print. Level
 	 * 	of root is 0. If tree has no nodes, prints "is empty"
@@ -607,7 +653,7 @@ public class BinaryTree {
 	/** Prompts the user for a state name and deletes that state's node, if the
 	 *  state exists. Finds node by changing the user's input using changeCase().
 	 */
-	public void testDelete() {	////////////////////////////////////////////////////////////
+	public void testDelete() {
 		System.out.println("Testing delete algorithm\n");
 		String name = Prompt.getString("Enter state name to delete (Q to quit)");
 		while (name.equalsIgnoreCase("q") == false) {
